@@ -11,7 +11,11 @@ class PropertyResource extends Resource
 {
     protected static ?string $model = Property::class;
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
-    protected static ?string $navigationGroup = 'Properties';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Properties';
+    }
 
     public static function form(Forms\Form $form): Forms\Form
     {
@@ -45,9 +49,11 @@ class PropertyResource extends Resource
             Tables\Columns\TextColumn::make('title')->searchable(),
             Tables\Columns\TextColumn::make('price')->money('cad'),
             Tables\Columns\TextColumn::make('city'),
-            Tables\Columns\BadgeColumn::make('status')->colors([
-                'success'=>'available','danger'=>'rented','warning'=>'maintenance',
-            ]),
+            Tables\Columns\TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
+                'available' => 'success',
+                'rented' => 'danger',
+                'maintenance' => 'warning',
+            }),
             Tables\Columns\TextColumn::make('type'),
             Tables\Columns\TextColumn::make('created_at')->dateTime(),
         ])->filters([
