@@ -12,7 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->validateCsrfTokens(except: [
+            'api/stripe/connect/webhook',
+        ]);
+
+        $middleware->alias([
+            'role.tenant' => \App\Http\Middleware\TenantMiddleware::class,
+            'role.manager' => \App\Http\Middleware\ManagerMiddleware::class,
+            'role.owner' => \App\Http\Middleware\OwnerMiddleware::class,
+            'role.admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -35,4 +35,26 @@ return [
         ],
     ],
 
+    'clover' => [
+        'public_token' => env('CLOVER_PUBLIC_TOKEN'),
+        'private_token' => env('CLOVER_PRIVATE_TOKEN'),
+        'merchant_id' => env('CLOVER_MERCHANT_ID'),
+        'env' => env('CLOVER_ENV', 'sandbox'),
+    ],
+
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'connect_client_id' => env('STRIPE_CONNECT_CLIENT_ID'),
+        'connect_webhook_secret' => env('STRIPE_CONNECT_WEBHOOK_SECRET'),
+    ],
+
+    'webpush' => [
+        'vapid' => [
+            'subject' => env('VAPID_SUBJECT', 'mailto:info@tenanttrust.ca'),
+            'public_key' => env('VAPID_PUBLIC_KEY'),
+            'private_key' => env('VAPID_PRIVATE_KEY'),
+        ],
+    ],
+
 ];

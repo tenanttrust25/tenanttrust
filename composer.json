@@ -7,9 +7,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "filament/filament": "^5.7",
+        "barryvdh/laravel-dompdf": "^3.1",
+        "filament/filament": "^3.2",
         "laravel/framework": "^13.8",
-        "laravel/tinker": "^3.0"
+        "laravel/tinker": "^3.0",
+        "minishlink/web-push": "^11.0",
+        "stripe/stripe-php": "^20.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

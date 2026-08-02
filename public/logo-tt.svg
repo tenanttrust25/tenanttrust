@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 380" width="280" height="380">
+  <!-- Black background panel -->
+  <rect x="0" y="0" width="280" height="380" rx="12" ry="12" fill="#1a1a1a"/>
+
+  <!-- Gold roof silhouette -->
+  <polygon points="140,40 40,130 50,130 140,55 230,130 240,130" fill="#DCA54A"/>
+
+  <!-- Roof left side -->
+  <polygon points="140,40 40,130 45,130 140,48" fill="#DCA54A"/>
+
+  <!-- Roof right side -->
+  <polygon points="140,40 240,130 235,130 140,48" fill="#DCA54A"/>
+
+  <!-- Main building body -->
+  <rect x="80" y="130" width="120" height="90" fill="#DCA54A" rx="2"/>
+
+  <!-- Four-pane window -->
+  <rect x="105" y="145" width="70" height="55" fill="#1a1a1a" rx="2"/>
+  <!-- Window cross -->
+  <line x1="140" y1="145" x2="140" y2="200" stroke="#DCA54A" stroke-width="2"/>
+  <line x1="105" y1="172.5" x2="175" y2="172.5" stroke="#DCA54A" stroke-width="2"/>
+
+  <!-- Window gold border -->
+  <rect x="105" y="145" width="70" height="55" fill="none" stroke="#DCA54A" stroke-width="1.5" rx="2"/>
+
+  <!-- Tenant Trust text -->
+  <text x="140" y="250" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="bold" fill="white" letter-spacing="1.5">Tenant Trust</text>
+
+  <!-- Thin gold line divider -->
+  <line x1="60" y1="265" x2="220" y2="265" stroke="#DCA54A" stroke-width="1"/>
+
+  <!-- Contact details -->
+  <text x="140" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#aaaaaa">123 Main Street West</text>
+  <text x="140" y="308" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#aaaaaa">Sudbury, ON P3E 4T2</text>
+  <text x="140" y="326" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#aaaaaa">info@tenanttrust.ca</text>
+  <text x="140" y="344" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#aaaaaa">(705) 555-0123</text>
+
+  <!-- Gold line at bottom -->
+  <rect x="40" y="365" width="200" height="3" rx="1.5" fill="#DCA54A"/>
+</svg>
