@@ -103,6 +103,7 @@ class PropertyResource extends Resource
                                         'Microwave',
                                         'Gym access',
                                         'Pet friendly',
+                                        'Fully Furnished',
                                         'Utilities included',
                                         'Internet included',
                                         'Elevator access',
