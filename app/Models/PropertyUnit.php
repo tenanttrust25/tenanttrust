@@ -38,6 +38,7 @@ class PropertyUnit extends Model
         'monthly_management_fee',
         'status',
         'description',
+        'amenities',
         'slug',
         'tenant_id',
         'tenant2_id',
@@ -53,5 +54,6 @@ class PropertyUnit extends Model
         'square_feet' => 'integer',
         'photo' => 'array',
         'videos' => 'array',
+        'amenities' => 'array',
     ];
 }

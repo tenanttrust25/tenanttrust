@@ -88,6 +88,33 @@ class PropertyResource extends Resource
                                 Forms\Components\RichEditor::make('description')
                                     ->label('Unit Description')
                                     ->columnSpanFull(),
+                                Forms\Components\TagsInput::make('amenities')
+                                    ->label('Amenities')
+                                    ->placeholder('Type an amenity and press Enter — e.g. In-suite laundry, Parking, Balcony')
+                                    ->suggestions([
+                                        'In-suite laundry',
+                                        'Laundry in building',
+                                        'Parking',
+                                        'Balcony',
+                                        'Dishwasher',
+                                        'Air conditioning',
+                                        'Storage locker',
+                                        'Fridge & stove',
+                                        'Microwave',
+                                        'Gym access',
+                                        'Pet friendly',
+                                        'Utilities included',
+                                        'Internet included',
+                                        'Elevator access',
+                                        'Wheelchair accessible',
+                                        'Furnished',
+                                        'Patio / yard',
+                                        'On-site laundry',
+                                        'Heating included',
+                                        'Water included',
+                                    ])
+                                    ->columnSpanFull()
+                                    ->helperText('List everything this unit comes with. Shown on the public listing.'),
                                 Forms\Components\TextInput::make('unit')
                                     ->label('Unit #')
                                     ->required()

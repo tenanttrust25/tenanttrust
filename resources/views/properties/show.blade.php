@@ -118,6 +118,23 @@
                         </div>
                     </div>
 
+                    @php
+                        $unitAmenities = array_filter((array)($activeUnit?->amenities ?? []));
+                        $propertyAmenities = array_filter((array)($property->tags ?? []));
+                        $amenities = !empty($unitAmenities) ? $unitAmenities : $propertyAmenities;
+                    @endphp
+                    @if(!empty($amenities))
+                    <!-- Amenities -->
+                    <h2 style="font-size:1.4rem;color:#0F172A;margin:32px 0 20px;">Amenities</h2>
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                        @foreach($amenities as $amenity)
+                            <span style="display:inline-flex;align-items:center;gap:6px;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:999px;padding:8px 16px;font-size:0.9rem;color:#0F172A;">
+                                ✅ {{ $amenity }}
+                            </span>
+                        @endforeach
+                    </div>
+                    @endif
+
                     <!-- Description -->
                     <h2 style="font-size:1.4rem;color:#0F172A;margin-bottom:20px;">Description</h2>
                     <div style="line-height:1.8;color:#4A4A4A;">
