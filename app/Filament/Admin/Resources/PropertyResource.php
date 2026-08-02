@@ -156,7 +156,7 @@ class PropertyResource extends Resource
                                     ->label('Photos')
                                     ->image()
                                     ->multiple()
-                                    ->maxFiles(10)
+                                    ->maxFiles(30)
                                     ->directory('properties'),
                                 Forms\Components\FileUpload::make('videos')
                                     ->label('Videos')
