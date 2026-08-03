@@ -80,7 +80,7 @@ class UserResource extends Resource
                         $balance = $record->outstandingBalance();
                         $color = $balance > 0 ? 'text-danger-600' : 'text-success-600';
 
-                        return \Illuminate\Support\HtmlString::fromHtml(
+                        return new \Illuminate\Support\HtmlString(
                             "<span class=\"{$color} text-xl font-bold\">$" . number_format($balance, 2) . "</span>"
                         );
                     })
