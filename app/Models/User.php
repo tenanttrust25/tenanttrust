@@ -37,6 +37,22 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class, 'tenant_id');
     }
 
+    /**
+     * Current outstanding balance: unpaid amounts on pending/overdue invoices,
+     * net of any completed (including partial) payments.
+     */
+    public function outstandingBalance(): float
+    {
+        $invoices = $this->invoices()
+            ->whereIn('status', ['pending', 'overdue'])
+            ->withSum(['payments as paid_sum' => fn ($q) => $q->where('status', 'completed')], 'amount')
+            ->get();
+
+        return max(0, $invoices->sum(
+            fn ($invoice) => max(0, (float) $invoice->amount - (float) ($invoice->paid_sum ?? 0))
+        ));
+    }
+
     public function tenantFiles(): HasMany
     {
         return $this->hasMany(TenantFile::class, 'tenant_id');

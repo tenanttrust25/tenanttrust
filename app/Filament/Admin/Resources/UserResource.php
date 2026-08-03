@@ -70,6 +70,25 @@ class UserResource extends Resource
                     ->native(false)
                     ->displayFormat("M d, Y"),
 
+                Forms\Components\Placeholder::make("outstanding_balance")
+                    ->label("Outstanding Balance")
+                    ->content(function (?User $record) {
+                        if (! $record) {
+                            return '$0.00';
+                        }
+
+                        $balance = $record->outstandingBalance();
+                        $color = $balance > 0 ? 'text-danger-600' : 'text-success-600';
+
+                        return \Illuminate\Support\HtmlString::fromHtml(
+                            "<span class=\"{$color} text-xl font-bold\">$" . number_format($balance, 2) . "</span>"
+                        );
+                    })
+                    ->extraAttributes([
+                        'class' => 'rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4',
+                    ])
+                    ->visible(fn (string $operation): bool => $operation === 'edit'),
+
                 Forms\Components\DatePicker::make("end_date")
                     ->label("End Date")
                     ->native(false)
