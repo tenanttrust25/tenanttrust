@@ -16,7 +16,7 @@ You have a new invoice from Tenant Trust.
 @if ($invoice->file_path)
 A copy of the invoice PDF is attached to this email.
 @else
-If you have any questions about this invoice, contact us at info@tenantrust.ca or call (705) 555-0123.
+If you have any questions about this invoice, contact us at info@tenanttrust.ca or call (705) 555-0123.
 @endif
 
 Thanks,<br>
