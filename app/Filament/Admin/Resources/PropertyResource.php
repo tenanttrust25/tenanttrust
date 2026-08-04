@@ -71,6 +71,15 @@ class PropertyResource extends Resource
                             ->minValue(1)
                             ->default(1)
                             ->helperText('Number of units in this building'),
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'active' => 'Active',
+                                'rented' => 'Rented',
+                                'sold' => 'Sold',
+                            ])
+                            ->default('active')
+                            ->helperText('Building-level status shown on the properties list'),
                     ]),
 
 
