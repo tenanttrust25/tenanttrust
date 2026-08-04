@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\OwnerInvoiceResource\Pages;
+use App\Mail\OwnerInvoiceMail;
 use App\Models\OwnerInvoice;
 use App\Models\Property;
 use App\Models\User;
@@ -12,11 +13,13 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class OwnerInvoiceResource extends Resource
@@ -162,6 +165,46 @@ class OwnerInvoiceResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->actions([
+                Tables\Actions\Action::make('email')
+                    ->label('Email Invoice')
+                    ->icon('heroicon-o-envelope')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Send Invoice to Client')
+                    ->modalContent(function (OwnerInvoice $record) {
+                        return view('filament.admin.owner-invoice-email-confirm', [
+                            'invoice' => $record,
+                        ]);
+                    })
+                    ->action(function (OwnerInvoice $record) {
+                        $owner = $record->owner;
+
+                        if (!$owner?->email) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Client has no email address')
+                                ->body("Invoice #{$record->invoice_number} can't be emailed — the client has no email on file.")
+                                ->send();
+                            return;
+                        }
+
+                        try {
+                            Mail::to($owner->email)
+                                ->send(new OwnerInvoiceMail($record));
+
+                            Notification::make()
+                                ->success()
+                                ->title('Invoice emailed!')
+                                ->body("Invoice #{$record->invoice_number} sent to {$owner->email}")
+                                ->send();
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Failed to send email')
+                                ->body($e->getMessage())
+                                ->send();
+                        }
+                    }),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
