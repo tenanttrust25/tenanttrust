@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OwnerInvoice;
+use App\Models\PropertyUnit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session as StripeCheckoutSession;
@@ -21,7 +22,35 @@ class OwnerInvoicePaymentController extends Controller
             'invoice' => $invoice,
             'paid' => false,
             'cancelled' => false,
+            'breakdown' => $this->buildBreakdown($invoice),
         ]);
+    }
+
+    /**
+     * Per-unit management fee breakdown for the invoice's property.
+     * Returns null when there's no property or no units carry a fee.
+     */
+    private function buildBreakdown(OwnerInvoice $invoice): ?array
+    {
+        if (! $invoice->property) {
+            return null;
+        }
+
+        $units = $invoice->property->units()
+            ->whereNotNull('monthly_management_fee')
+            ->orderByRaw('unit + 0')
+            ->get();
+
+        if ($units->isEmpty()) {
+            return null;
+        }
+
+        return [
+            'items' => $units->map(fn (PropertyUnit $u) => [
+                'label' => 'Unit ' . $u->unit . ($u->tenant ? ' — ' . $u->tenant->name : ''),
+                'amount' => (float) $u->monthly_management_fee,
+            ])->values()->all(),
+        ];
     }
 
     /**
@@ -104,6 +133,7 @@ class OwnerInvoicePaymentController extends Controller
             'invoice' => $invoice,
             'paid' => $paid,
             'cancelled' => false,
+            'breakdown' => $this->buildBreakdown($invoice),
         ]);
     }
 
@@ -118,6 +148,7 @@ class OwnerInvoicePaymentController extends Controller
             'invoice' => $invoice,
             'paid' => false,
             'cancelled' => true,
+            'breakdown' => $this->buildBreakdown($invoice),
         ]);
     }
 }

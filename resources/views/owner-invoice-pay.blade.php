@@ -81,6 +81,49 @@
             margin: 16px 0 24px;
             line-height: 1.6;
         }
+        .breakdown {
+            background: #F7F7F8;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 16px 0 24px;
+        }
+        .breakdown-title {
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #0F172A;
+            margin-bottom: 10px;
+        }
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 14px;
+            padding: 4px 0;
+        }
+        .breakdown-row .b-label {
+            color: #4A4A4A;
+        }
+        .breakdown-row .b-amount {
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+            color: #0F172A;
+            white-space: nowrap;
+        }
+        .breakdown-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-top: 1px solid #E5E7EB;
+            margin-top: 8px;
+            padding-top: 10px;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            color: #0F172A;
+        }
         .btn {
             display: block;
             width: 100%;
@@ -162,6 +205,23 @@
             <h1>Payment Not Completed</h1>
             <p class="sub">Invoice #{{ $invoice->invoice_number }}</p>
             <div class="amount">${{ number_format($invoice->amount, 2) }}</div>
+
+            @if (! empty($breakdown['items']))
+                <div class="breakdown">
+                    <div class="breakdown-title">What this covers — monthly management fees</div>
+                    @foreach ($breakdown['items'] as $item)
+                        <div class="breakdown-row">
+                            <span class="b-label">{{ $item['label'] }}</span>
+                            <span class="b-amount">${{ number_format($item['amount'], 2) }}</span>
+                        </div>
+                    @endforeach
+                    <div class="breakdown-total">
+                        <span>Total</span>
+                        <span>${{ number_format($invoice->amount, 2) }}</span>
+                    </div>
+                </div>
+            @endif
+
             <p class="message" style="margin-top:16px;">
                 Your payment was cancelled. No charge was made.<br>
                 You can try again whenever you're ready.
@@ -183,6 +243,22 @@
 
             @if ($invoice->description)
                 <div class="desc">{{ $invoice->description }}</div>
+            @endif
+
+            @if (! empty($breakdown['items']))
+                <div class="breakdown">
+                    <div class="breakdown-title">What this covers — monthly management fees</div>
+                    @foreach ($breakdown['items'] as $item)
+                        <div class="breakdown-row">
+                            <span class="b-label">{{ $item['label'] }}</span>
+                            <span class="b-amount">${{ number_format($item['amount'], 2) }}</span>
+                        </div>
+                    @endforeach
+                    <div class="breakdown-total">
+                        <span>Total</span>
+                        <span>${{ number_format($invoice->amount, 2) }}</span>
+                    </div>
+                </div>
             @endif
 
             @if (in_array($invoice->status, ['pending', 'overdue']))
