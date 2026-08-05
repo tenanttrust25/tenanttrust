@@ -35,30 +35,37 @@ class OwnerInvoicePaymentController extends Controller
             return redirect()->route('invoice.pay.show', $token);
         }
 
-        Stripe::setApiKey(config('services.stripe.secret'));
+        try {
+            Stripe::setApiKey(config('services.stripe.secret'));
 
-        $amountCents = (int) round($invoice->amount * 100);
+            $amountCents = (int) round($invoice->amount * 100);
 
-        $session = StripeCheckoutSession::create([
-            'mode' => 'payment',
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'cad',
-                    'unit_amount' => $amountCents,
-                    'product_data' => [
-                        'name' => 'Invoice #' . $invoice->invoice_number,
-                        'description' => 'Tenant Trust invoice',
+            $session = StripeCheckoutSession::create([
+                'mode' => 'payment',
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'cad',
+                        'unit_amount' => $amountCents,
+                        'product_data' => [
+                            'name' => 'Invoice #' . $invoice->invoice_number,
+                            'description' => 'Tenant Trust invoice',
+                        ],
                     ],
+                    'quantity' => 1,
+                ]],
+                'metadata' => [
+                    'owner_invoice_id' => (string) $invoice->id,
+                    'invoice_number' => $invoice->invoice_number,
                 ],
-                'quantity' => 1,
-            ]],
-            'metadata' => [
-                'owner_invoice_id' => (string) $invoice->id,
-                'invoice_number' => $invoice->invoice_number,
-            ],
-            'success_url' => route('invoice.pay.success', $token) . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('invoice.pay.cancel', $token),
-        ]);
+                'success_url' => route('invoice.pay.success', $token) . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('invoice.pay.cancel', $token),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Stripe checkout session creation failed for invoice #' . $invoice->invoice_number . ': ' . $e->getMessage());
+
+            return redirect()->route('invoice.pay.show', $token)
+                ->with('error', 'Payment is temporarily unavailable. Please try again shortly or contact Tenant Trust.');
+        }
 
         return redirect()->away($session->url);
     }

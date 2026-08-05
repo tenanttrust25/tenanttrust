@@ -128,11 +128,25 @@
             color: #B0B0B0;
             margin-top: 20px;
         }
+        .error-banner {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="brand">Tenant<span>Trust</span></div>
+
+        @if (session('error'))
+            <div class="error-banner">⚠️ {{ session('error') }}</div>
+        @endif
 
         @if ($paid)
             <div class="success-icon">✓</div>

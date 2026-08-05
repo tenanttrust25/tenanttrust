@@ -37,18 +37,26 @@ class StripePaymentController extends Controller
             return response()->json(["error" => "Invoice already paid or cancelled."], 400);
         }
 
-        Stripe::setApiKey(config("services.stripe.secret"));
+        try {
+            Stripe::setApiKey(config("services.stripe.secret"));
 
-        $amountInCents = (int) round($invoice->amount * 100);
+            $amountInCents = (int) round($invoice->amount * 100);
 
-        $intent = PaymentIntent::create([
-            "amount" => $amountInCents,
-            "currency" => "cad",
-            "metadata" => [
-                "invoice_id" => $invoice->id,
-                "invoice_number" => $invoice->invoice_number,
-            ],
-        ]);
+            $intent = PaymentIntent::create([
+                "amount" => $amountInCents,
+                "currency" => "cad",
+                "metadata" => [
+                    "invoice_id" => $invoice->id,
+                    "invoice_number" => $invoice->invoice_number,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Stripe payment intent creation failed for invoice #{$invoice->invoice_number}: " . $e->getMessage());
+
+            return response()->json([
+                "error" => "Payment service is temporarily unavailable. Please try again later.",
+            ], 503);
+        }
 
         return response()->json([
             "client_secret" => $intent->client_secret,
@@ -69,9 +77,16 @@ class StripePaymentController extends Controller
             return response()->json(["error" => "Unauthorized."], 403);
         }
 
-        Stripe::setApiKey(config("services.stripe.secret"));
+        try {
+            Stripe::setApiKey(config("services.stripe.secret"));
+            $intent = PaymentIntent::retrieve($request->payment_intent_id);
+        } catch (\Throwable $e) {
+            Log::error("Stripe payment intent retrieval failed: " . $e->getMessage());
 
-        $intent = PaymentIntent::retrieve($request->payment_intent_id);
+            return response()->json([
+                "error" => "Payment service is temporarily unavailable. Please try again later.",
+            ], 503);
+        }
 
         if ($intent->status !== "succeeded") {
             return response()->json([
