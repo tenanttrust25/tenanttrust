@@ -38,6 +38,9 @@ class OwnerInvoiceMail extends Mailable
                 "ownerName" => $this->invoice->owner?->name,
                 "amount" => number_format($this->invoice->amount, 2),
                 "dueDate" => $this->invoice->due_date?->format("F j, Y"),
+                "payUrl" => $this->invoice->payment_token
+                    ? url('/invoice/pay/' . $this->invoice->payment_token)
+                    : null,
             ],
         );
     }

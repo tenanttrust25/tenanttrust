@@ -9,6 +9,14 @@ You have a new invoice from Tenant Trust.
 **Amount:** ${{ $amount }}  
 **Due Date:** {{ $dueDate }}
 
+@if ($payUrl && in_array($invoice->status, ['pending', 'overdue']))
+<x-mail::button :url="$payUrl" color="success">
+Pay Now
+</x-mail::button>
+
+You can also pay anytime using this link: [{{ $payUrl }}]({{ $payUrl }})
+@endif
+
 @if ($invoice->description)
 **Description:** {{ $invoice->description }}
 @endif

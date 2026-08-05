@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class OwnerInvoice extends Model
 {
@@ -19,12 +20,29 @@ class OwnerInvoice extends Model
         'due_date',
         'status',
         'file_path',
+        'payment_token',
+        'paid_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'due_date' => 'date',
+        'paid_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (OwnerInvoice $invoice) {
+            if (empty($invoice->payment_token)) {
+                $invoice->payment_token = Str::random(40);
+            }
+        });
+    }
+
+    public function getPayUrlAttribute(): string
+    {
+        return url('/invoice/pay/' . $this->payment_token);
+    }
 
     public function owner(): BelongsTo
     {

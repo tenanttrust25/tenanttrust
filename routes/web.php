@@ -89,6 +89,12 @@ Route::get("/tenant/year-end/receipt", function () {
     ]);
 })->name("tenant.year-end.receipt");
 
+// Client invoice payments (public, tokenized) — must be BEFORE the catch-all slug route
+Route::get("/invoice/pay/{token}", [App\Http\Controllers\OwnerInvoicePaymentController::class, "show"])->name("invoice.pay.show");
+Route::post("/invoice/pay/{token}/checkout", [App\Http\Controllers\OwnerInvoicePaymentController::class, "checkout"])->name("invoice.pay.checkout");
+Route::get("/invoice/pay/{token}/success", [App\Http\Controllers\OwnerInvoicePaymentController::class, "success"])->name("invoice.pay.success");
+Route::get("/invoice/pay/{token}/cancel", [App\Http\Controllers\OwnerInvoicePaymentController::class, "cancel"])->name("invoice.pay.cancel");
+
 // Dynamic pages from database - must be LAST
 Route::get("/{slug}", [WebsiteController::class, "page"])->name("page");
 
