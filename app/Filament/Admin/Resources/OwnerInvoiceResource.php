@@ -74,7 +74,7 @@ class OwnerInvoiceResource extends Resource
                         }
 
                         $property = Property::find($state);
-                        $fee = $property?->managementFeeTotal();
+                        $fee = $property?->managementFeeTotalWithTax();
                         if ($fee !== null) {
                             $set('amount', number_format($fee, 2, '.', ''));
                         }

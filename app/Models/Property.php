@@ -108,9 +108,16 @@ class Property extends Model
         return $query->where("status", "vacant");
     }
 
+    public const MANAGEMENT_FEE_TAX_RATE = 0.13;
+
     public function managementFeeTotal(): ?float
     {
-        // Property-level fee takes precedence over per-unit fees
+        // Per-unit monthly fees take precedence (e.g. 137 Hillsboro: 2 units x $60)
+        $unitFees = (float) $this->units()->sum('monthly_management_fee');
+        if ($unitFees > 0) {
+            return round($unitFees, 2);
+        }
+
         if ($this->management_fee_type && $this->management_fee_value !== null) {
             if ($this->management_fee_type === 'percentage') {
                 $totalRent = (float) $this->units()->sum('rent_amount');
@@ -120,12 +127,17 @@ class Property extends Model
             return round((float) $this->management_fee_value, 2);
         }
 
-        $unitFees = (float) $this->units()->sum('monthly_management_fee');
-        if ($unitFees > 0) {
-            return round($unitFees, 2);
+        return null;
+    }
+
+    public function managementFeeTotalWithTax(): ?float
+    {
+        $fee = $this->managementFeeTotal();
+        if ($fee === null) {
+            return null;
         }
 
-        return null;
+        return round($fee * (1 + self::MANAGEMENT_FEE_TAX_RATE), 2);
     }
 
     public function getFormattedPriceAttribute(): string
