@@ -65,7 +65,20 @@ class OwnerInvoiceResource extends Resource
                     })
                     ->searchable()
                     ->preload()
-                    ->nullable(),
+                    ->nullable()
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if (!$state) {
+                            $set('amount', null);
+                            return;
+                        }
+
+                        $property = Property::find($state);
+                        $fee = $property?->managementFeeTotal();
+                        if ($fee !== null) {
+                            $set('amount', number_format($fee, 2, '.', ''));
+                        }
+                    }),
 
                 TextInput::make('invoice_number')
                     ->label('Invoice #')

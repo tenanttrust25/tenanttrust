@@ -108,6 +108,26 @@ class Property extends Model
         return $query->where("status", "vacant");
     }
 
+    public function managementFeeTotal(): ?float
+    {
+        // Property-level fee takes precedence over per-unit fees
+        if ($this->management_fee_type && $this->management_fee_value !== null) {
+            if ($this->management_fee_type === 'percentage') {
+                $totalRent = (float) $this->units()->sum('rent_amount');
+                return round($totalRent * ($this->management_fee_value / 100), 2);
+            }
+
+            return round((float) $this->management_fee_value, 2);
+        }
+
+        $unitFees = (float) $this->units()->sum('monthly_management_fee');
+        if ($unitFees > 0) {
+            return round($unitFees, 2);
+        }
+
+        return null;
+    }
+
     public function getFormattedPriceAttribute(): string
     {
         $prefix = "$";
