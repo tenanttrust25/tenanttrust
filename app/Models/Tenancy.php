@@ -31,6 +31,26 @@ class Tenancy extends Model
         "security_deposit" => "decimal:2",
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (Tenancy $tenancy) {
+            // Admin unit repeater creates tenancies with only tenant_id + property_unit_id;
+            // backfill the NOT NULL columns so those saves don't 500.
+            if (empty($tenancy->property_id) && $tenancy->property_unit_id) {
+                $unit = $tenancy->propertyUnit;
+                $tenancy->property_id = $unit?->property_id;
+
+                if ($tenancy->lease_start === null) {
+                    $tenancy->lease_start = now()->toDateString();
+                }
+
+                if ($tenancy->rent_amount === null && $unit) {
+                    $tenancy->rent_amount = $unit->rent_amount;
+                }
+            }
+        });
+    }
+
     public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);
