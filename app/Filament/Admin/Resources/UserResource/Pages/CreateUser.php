@@ -33,7 +33,7 @@ class CreateUser extends CreateRecord
         // Try to send email
         $emailSent = false;
         try {
-            Mail::mailer("sendmail")
+            Mail::mailer("smtp")
                 ->to($user->email)
                 ->send(new UserInvitationMail($user, $this->tempPassword, $loginUrl));
             $emailSent = true;

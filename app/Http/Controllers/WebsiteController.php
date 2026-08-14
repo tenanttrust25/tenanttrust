@@ -74,7 +74,7 @@ class WebsiteController extends Controller
 
         // Notify admin
         try {
-            \Illuminate\Support\Facades\Mail::mailer("sendmail")
+            \Illuminate\Support\Facades\Mail::mailer("smtp")
                 ->to("info@tenanttrust.ca")
                 ->send(new \App\Mail\ContactSubmissionMail($submission));
         } catch (\Exception $e) {

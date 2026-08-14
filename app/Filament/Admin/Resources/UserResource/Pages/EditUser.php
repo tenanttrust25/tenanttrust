@@ -49,7 +49,7 @@ class EditUser extends EditRecord
 
                     $emailSent = false;
                     try {
-                        Mail::mailer("sendmail")
+                        Mail::mailer("smtp")
                             ->to($user->email)
                             ->send(new \App\Mail\UserInvitationMail($user, $newPassword, $loginUrl));
                         $emailSent = true;

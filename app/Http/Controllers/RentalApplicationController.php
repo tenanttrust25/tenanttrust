@@ -76,7 +76,7 @@ class RentalApplicationController extends Controller
 
         // Notify admin
         try {
-            Mail::mailer("sendmail")
+            Mail::mailer("smtp")
                 ->to("info@tenanttrust.ca")
                 ->send(new RentalApplicationMail($application));
         } catch (\Exception $e) {
