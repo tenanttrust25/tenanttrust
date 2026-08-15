@@ -27,3 +27,6 @@ Homestead.yaml
 Thumbs.db
 .env.update
 public/site
+-e 
+# Local DB backups
+/database/backups
