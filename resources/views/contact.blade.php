@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Contact Us - Tenant Trust')
+@section('title', 'Contact Us | Tenant Trust Property Management Sudbury')
+@section('meta_description', 'Get in touch with Tenant Trust property management in Sudbury, Ontario. Call 249-523-3331 or email info@tenanttrust.ca.')
 
 @section('content')
     <!-- Page Header -->

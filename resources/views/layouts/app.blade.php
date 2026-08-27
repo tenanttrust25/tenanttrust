@@ -3,8 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Tenant Trust - Professional Property Management Services">
-    <title>@yield('title', 'Tenant Trust - Property Management')</title>
+    <meta name="description" content="@yield('meta_description', 'Tenant Trust is a professional property management company serving Greater Sudbury, Ontario. Quality rental properties, landlord services, and tenant placement you can trust.')">
+    <title>@yield('title', 'Tenant Trust | Property Management in Sudbury, Ontario')</title>
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="Tenant Trust">
+    <meta property="og:title" content="@yield('title', 'Tenant Trust | Property Management in Sudbury, Ontario')">
+    <meta property="og:description" content="@yield('meta_description', 'Tenant Trust is a professional property management company serving Greater Sudbury, Ontario. Quality rental properties, landlord services, and tenant placement you can trust.')">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="{{ url('/og-cover.png') }}">
+    <meta property="og:locale" content="en_CA">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'Tenant Trust | Property Management in Sudbury, Ontario')">
+    <meta name="twitter:description" content="@yield('meta_description', 'Tenant Trust is a professional property management company serving Greater Sudbury, Ontario. Quality rental properties, landlord services, and tenant placement you can trust.')">
+    <meta name="twitter:image" content="{{ url('/og-cover.png') }}">
+
+    <!-- LocalBusiness structured data -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@type": ["LocalBusiness", "RealEstateAgent"],
+        "name": "Tenant Trust",
+        "description": "Professional property management services in Greater Sudbury, Ontario — connecting quality tenants with exceptional rental properties.",
+        "url": "{{ url('/') }}",
+        "logo": "{{ url('/logo-tt.png') }}",
+        "image": "{{ url('/og-cover.png') }}",
+        "telephone": "+1-249-523-3331",
+        "email": "info@tenanttrust.ca",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "474 McKim St Unit 3",
+            "addressLocality": "Sudbury",
+            "addressRegion": "ON",
+            "postalCode": "P3C 2L6",
+            "addressCountry": "CA"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 46.4897,
+            "longitude": -80.9894
+        },
+        "areaServed": [
+            { "@type": "City", "name": "Sudbury" },
+            { "@type": "AdministrativeArea", "name": "Greater Sudbury" }
+        ]
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">

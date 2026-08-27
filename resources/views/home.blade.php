@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Tenant Trust - Find Your Perfect Rental')
+@section('title', 'Tenant Trust | Property Management in Sudbury, Ontario')
+@section('meta_description', 'Find quality rental properties and professional property management in Sudbury, Ontario. Tenant Trust manages rental homes across Greater Sudbury — apply online today.')
 
 @section('content')
     <!-- Hero Section -->

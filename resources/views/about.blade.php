@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'About Us - Tenant Trust')
+@section('title', 'About Us | Tenant Trust Property Management Sudbury')
+@section('meta_description', 'Tenant Trust is a dedicated property management company serving property owners and tenants across Greater Sudbury and area.')
 
 @section('content')
     <!-- About Hero -->
