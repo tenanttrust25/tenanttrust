@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\PropertyResource\Pages;
+use App\Filament\Components\ImageUpload;
 use App\Models\Property;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -189,7 +190,7 @@ class PropertyResource extends Resource
                                         'occupied' => 'Occupied',
                                     ])
                                     ->default('vacant'),
-                                Forms\Components\FileUpload::make('photo')
+                                ImageUpload::make('photo')
                                     ->label('Photos')
                                     ->image()
                                     ->multiple()

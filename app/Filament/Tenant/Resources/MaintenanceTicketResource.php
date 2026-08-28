@@ -2,6 +2,7 @@
 
 namespace App\Filament\Tenant\Resources;
 
+use App\Filament\Components\ImageUpload;
 use App\Models\MaintenanceTicket;
 use App\Models\Tenancy;
 use Filament\Forms\Form;
@@ -97,7 +98,7 @@ class MaintenanceTicketResource extends Resource
                     ->default("medium")
                     ->required(),
 
-                FileUpload::make("photos")
+                ImageUpload::make("photos")
                     ->label("Photos")
                     ->multiple()
                     ->image()
