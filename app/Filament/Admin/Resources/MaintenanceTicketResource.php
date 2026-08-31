@@ -32,9 +32,7 @@ class MaintenanceTicketResource extends Resource
                 TextInput::make("ticket_number")->label("Ticket #")->disabled(),
                 Placeholder::make("tenant")
                     ->label("Tenant")
-                    ->content(fn (MaintenanceTicket $record): string => $record->tenant
-                        ? $record->tenant->name . " — " . ($record->tenant->phone ?? "no phone") . " · " . ($record->tenant->email ?? "no email")
-                        : "Not matched"),
+                    ->content(fn (MaintenanceTicket $record): string => $record->tenant?->name ?? "Not matched"),
                 Placeholder::make("property")
                     ->label("Property")
                     ->content(fn (MaintenanceTicket $record): string => $record->property
