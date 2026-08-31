@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'twilio/voice',
             'twilio/gather',
             'twilio/think',
+            'twilio/escalate',
+            'twilio/maintenance',
             'twilio/dial-result',
             'twilio/record',
         ]);

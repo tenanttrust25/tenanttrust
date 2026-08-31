@@ -110,7 +110,10 @@ class TwilioVoiceController extends Controller
         // Turn cap: after 10 turns, wrap up politely.
         if ($data['turns'] > 10) {
             $log->update(['state' => 'escalate']);
-            return $this->twiml($this->escalatePrompt());
+            return $this->twiml(
+                '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
+                '<Response>' . $this->escalatePrompt() . '</Response>'
+            );
         }
 
         // ---- LLM-driven conversation (async: ack now, answer lands on /twilio/think) ----
@@ -519,14 +522,12 @@ class TwilioVoiceController extends Controller
 
     protected function escalatePrompt(): string
     {
-        return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
-            '<Response>' .
-            $this->say('Would you like me to connect you with Steve right now? Press 1, or say yes. ' .
+        // Inner verbs only — callers wrap this inside a <Response> document.
+        return $this->say('Would you like me to connect you with Steve right now? Press 1, or say yes. ' .
                 'Otherwise press 2, and Steve will call you back within 24 hours.') .
             $this->gatherTag($this->appUrl('/twilio/escalate'), 'speech dtmf', 1, 'Steve, yes, no, callback, 24') .
             $this->say('Sorry, I did not catch that.') .
-            $this->escalatePromptRetry() .
-            '</Response>';
+            $this->escalatePromptRetry();
     }
 
     protected function escalatePromptRetry(): string
@@ -660,7 +661,7 @@ class TwilioVoiceController extends Controller
     protected function say(string $text): string
     {
         return '<Say voice="' . $this->voice . '" language="' . $this->voiceLang . '">' .
-            $text . '</Say>';
+            $this->esc($text) . '</Say>';
     }
 
     protected function esc(string $text): string
