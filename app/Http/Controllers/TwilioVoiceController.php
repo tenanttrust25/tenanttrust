@@ -7,6 +7,7 @@ use App\Models\MaintenanceTicket;
 use App\Models\User;
 use App\Services\VoiceBrainService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -112,11 +113,83 @@ class TwilioVoiceController extends Controller
             return $this->twiml($this->escalatePrompt());
         }
 
-        // ---- LLM-driven conversation ----
-        $facts = $this->buildFacts($log, $input);
-        $reply = $this->brain->reply($log->transcript ?? [], $facts, $data['turns']);
+        // ---- LLM-driven conversation (async: ack now, answer lands on /twilio/think) ----
+        $cmd = PHP_BINARY . ' ' . escapeshellarg(base_path('artisan')) . ' voice:think ' .
+            escapeshellarg($log->call_sid) . ' ' . (int) $data['turns'] . ' > /dev/null 2>&1 &';
+        @exec($cmd);
 
-        // Interpret LLM action markers for state transitions.
+        return $this->twiml(
+            '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
+            '<Response>' .
+            $this->say('One moment please.') .
+            '<Redirect>' . $this->appUrl('/twilio/think') . '</Redirect>' .
+            '</Response>'
+        );
+    }
+
+    /**
+     * Second leg of the async reply: Twilio plays the ack, then POSTs here.
+     * Uses the reply the background process cached; falls back to a
+     * synchronous LLM call if the background job has not finished yet.
+     */
+    public function think(Request $request)
+    {
+        $callSid = (string) $request->input('CallSid', '');
+        $log = CallLog::where('call_sid', $callSid)->first();
+
+        if (!$log) {
+            return $this->twiml($this->fallbackResponse());
+        }
+
+        $turn = (int) ($log->data['turns'] ?? 1);
+        $reply = Cache::pull('voice_think_' . $callSid);
+
+        if ($reply === null) {
+            Log::info('VoiceThink: cache miss, computing synchronously', ['call_sid' => $callSid]);
+            $input = $this->lastCallerInput($log);
+            $facts = $this->buildFacts($log, $input);
+            $reply = $this->brain->reply($log->transcript ?? [], $facts, $turn);
+        }
+
+        return $this->respondWithReply($log, $reply, $turn);
+    }
+
+    /**
+     * Called by the background `voice:think` artisan command. Computes the
+     * reply for the call and caches it so /twilio/think can serve it fast.
+     */
+    public function computeReplyForCall(string $callSid, int $turn): void
+    {
+        $log = CallLog::where('call_sid', $callSid)->first();
+        if (!$log) {
+            return;
+        }
+        $input = $this->lastCallerInput($log);
+        $facts = $this->buildFacts($log, $input);
+        $reply = $this->brain->reply($log->transcript ?? [], $facts, $turn);
+        Cache::put('voice_think_' . $callSid, $reply, now()->addMinutes(5));
+        Log::info('VoiceThink: reply cached', ['call_sid' => $callSid, 'turn' => $turn]);
+    }
+
+    /**
+     * The most recent thing the caller said (from the transcript).
+     */
+    protected function lastCallerInput(CallLog $log): string
+    {
+        foreach (array_reverse($log->transcript ?? []) as $entry) {
+            if (strtolower((string) ($entry['speaker'] ?? '')) === 'caller') {
+                return (string) ($entry['text'] ?? '');
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Interpret the LLM reply's action markers and build the TwiML response.
+     * Shared by the async /twilio/think path and any synchronous fallback.
+     */
+    protected function respondWithReply(CallLog $log, string $reply, int $turn)
+    {
         $marker = null;
         if (str_contains($reply, '[TRANSFER]')) {
             $marker = 'transfer';
@@ -155,7 +228,8 @@ class TwilioVoiceController extends Controller
         }
 
         if ($marker === 'maintenance') {
-            // The caller just described the issue in $speech — log it now.
+            // The caller just described the issue — log it now.
+            $speech = $this->lastCallerInput($log);
             $ticket = $this->createTicketFromSpeech($log, $speech);
             $log->appendTranscript('jarvis', $reply);
             $log->update(['state' => 'converse', 'reference' => $ticket ? $ticket->ticket_number : null]);

@@ -30,6 +30,9 @@ Route::post("/twilio/voice", [App\Http\Controllers\TwilioVoiceController::class,
 Route::post("/twilio/gather", [App\Http\Controllers\TwilioVoiceController::class, "gather"])
     ->middleware("twilio.signature")
     ->name("twilio.gather");
+Route::post("/twilio/think", [App\Http\Controllers\TwilioVoiceController::class, "think"])
+    ->middleware("twilio.signature")
+    ->name("twilio.think");
 Route::post("/twilio/maintenance", [App\Http\Controllers\TwilioVoiceController::class, "maintenanceIssue"])
     ->middleware("twilio.signature")
     ->name("twilio.maintenance");
