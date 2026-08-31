@@ -29,7 +29,9 @@ class VoiceBrainService
     {
         $messages = [['role' => 'system', 'content' => $systemPrompt]];
 
-        foreach ($transcript as $entry) {
+        // Only send the most recent exchanges — full transcripts slow every reply.
+        $recent = array_slice($transcript, -6);
+        foreach ($recent as $entry) {
             $speaker = strtolower((string) ($entry['speaker'] ?? ''));
             $text = (string) ($entry['text'] ?? '');
             if ($text === '') {
@@ -57,7 +59,7 @@ class VoiceBrainService
                 ->post($this->baseUrl . '/chat/completions', [
                     'model' => $this->model,
                     'messages' => $messages,
-                    'max_tokens' => 250,
+                    'max_tokens' => 150,
                     'temperature' => 0.4,
                 ]);
 
