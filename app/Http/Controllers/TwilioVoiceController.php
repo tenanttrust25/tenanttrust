@@ -114,7 +114,8 @@ class TwilioVoiceController extends Controller
         }
 
         // ---- LLM-driven conversation (async: ack now, answer lands on /twilio/think) ----
-        $cmd = PHP_BINARY . ' ' . escapeshellarg(base_path('artisan')) . ' voice:think ' .
+        // PHP_BINARY is the FPM binary under php-fpm, NOT the CLI — resolve the real CLI php.
+        $cmd = $this->cliPhp() . ' ' . escapeshellarg(base_path('artisan')) . ' voice:think ' .
             escapeshellarg($log->call_sid) . ' ' . (int) $data['turns'] . ' > /dev/null 2>&1 &';
         @exec($cmd);
 
@@ -726,6 +727,25 @@ class TwilioVoiceController extends Controller
         }
         $digits = preg_replace('/\D/', '', (string) $phone);
         return strlen($digits) > 10 ? substr($digits, -10) : $digits;
+    }
+
+    /**
+     * The real CLI PHP binary. Under php-fpm, PHP_BINARY points at the FPM
+     * daemon (e.g. /usr/sbin/php-fpm8.4), which cannot run artisan — resolve
+     * the matching CLI binary instead.
+     */
+    protected function cliPhp(): string
+    {
+        if (!str_contains(PHP_BINARY, 'fpm')) {
+            return PHP_BINARY;
+        }
+        $candidates = ['/usr/bin/php8.4', '/usr/bin/php8.3', '/usr/bin/php'];
+        foreach ($candidates as $bin) {
+            if (is_executable($bin)) {
+                return $bin;
+            }
+        }
+        return 'php';
     }
 
     protected function appUrl(string $path): string

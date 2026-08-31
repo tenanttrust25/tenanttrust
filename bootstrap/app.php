@@ -14,9 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
             'api/stripe/connect/webhook',
+            'twilio/voice',
+            'twilio/gather',
+            'twilio/think',
+            'twilio/dial-result',
+            'twilio/record',
         ]);
 
         $middleware->alias([
+            'twilio.signature' => \App\Http\Middleware\VerifyTwilioSignature::class,
             'role.tenant' => \App\Http\Middleware\TenantMiddleware::class,
             'role.manager' => \App\Http\Middleware\ManagerMiddleware::class,
             'role.owner' => \App\Http\Middleware\OwnerMiddleware::class,
