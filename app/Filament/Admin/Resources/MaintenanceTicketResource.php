@@ -6,6 +6,7 @@ use App\Models\MaintenanceTicket;
 use Filament\Forms\Form;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
@@ -27,10 +28,10 @@ class MaintenanceTicketResource extends Resource
     {
         return $form
             ->schema([
-                TextColumn::make("ticket_number")->label("Ticket #")->disabled(),
-                TextColumn::make("tenant.name")->label("Tenant")->disabled(),
-                TextColumn::make("property.title")->label("Property")->disabled(),
-                TextColumn::make("title")->label("Title")->disabled(),
+                TextInput::make("ticket_number")->label("Ticket #")->disabled(),
+                TextInput::make("tenant.name")->label("Tenant")->disabled(),
+                TextInput::make("property.title")->label("Property")->disabled(),
+                TextInput::make("title")->label("Title")->disabled(),
                 Textarea::make("description")->label("Description")->disabled(),
                 Select::make("status")
                     ->label("Status")
