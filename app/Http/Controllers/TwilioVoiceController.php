@@ -249,6 +249,7 @@ class TwilioVoiceController extends Controller
             'tenant_id' => $tenant->id ?? null,
             'ticket_number' => $ticket->ticket_number,
         ]);
+        $this->sendMaintenanceEmail($log, $ticket);
 
         $confirm = 'I have logged maintenance ticket ' . $ticket->ticket_number . ' for your address. Our team will follow up with you within 24 hours. Is there anything else I can help you with?';
 
@@ -293,6 +294,7 @@ class TwilioVoiceController extends Controller
             'tenant_id' => $tenant->id ?? null,
             'ticket_number' => $ticket->ticket_number,
         ]);
+        $this->sendMaintenanceEmail($log, $ticket);
         return $ticket;
     }
 
@@ -497,6 +499,42 @@ class TwilioVoiceController extends Controller
     /* ================================================================
      * ESCALATION EMAIL (24h route — emails Steve the call log)
      * ================================================================ */
+
+    protected function sendMaintenanceEmail(CallLog $log, MaintenanceTicket $ticket): void
+    {
+        $tenant = $log->tenant_id ? User::find($log->tenant_id) : null;
+
+        $subject = '🔧 Maintenance request — ' . $ticket->ticket_number . ($tenant ? ' — ' . $tenant->name : '');
+        $body = "A tenant reported a maintenance issue via phone (Jarvis receptionist).\n\n"
+            . "Ticket: {$ticket->ticket_number}\n"
+            . "Status: open\n"
+            . "Time: " . now()->setTimezone('America/Toronto')->format('Y-m-d H:i T') . "\n"
+            . "Caller: {$log->from_number}\n"
+            . "Call SID: {$log->call_sid}\n"
+            . "Tenant: " . ($tenant->name ?? 'not matched') . "\n"
+            . "Address: " . ($tenant->address ?? 'not matched') . "\n\n"
+            . "Issue:\n" . ($ticket->description ?? $log->issue ?? 'n/a') . "\n";
+
+        try {
+            Mail::raw($body, function ($message) use ($subject) {
+                $message->to($this->escalationEmail)
+                    ->cc($this->notifyEmail)
+                    ->subject($subject)
+                    ->from(config('mail.from.address'), config('mail.from.name'));
+            });
+            Log::info('Twilio maintenance email sent', [
+                'to' => $this->escalationEmail,
+                'cc' => $this->notifyEmail,
+                'ticket' => $ticket->ticket_number,
+                'call_sid' => $log->call_sid,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Twilio maintenance email failed: ' . $e->getMessage(), [
+                'ticket' => $ticket->ticket_number,
+                'call_sid' => $log->call_sid,
+            ]);
+        }
+    }
 
     protected function sendEscalationEmail(CallLog $log): void
     {
