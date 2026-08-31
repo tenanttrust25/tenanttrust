@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Models\MaintenanceTicket;
 use Filament\Forms\Form;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -29,8 +30,19 @@ class MaintenanceTicketResource extends Resource
         return $form
             ->schema([
                 TextInput::make("ticket_number")->label("Ticket #")->disabled(),
-                TextInput::make("tenant.name")->label("Tenant")->disabled(),
-                TextInput::make("property.title")->label("Property")->disabled(),
+                Placeholder::make("tenant")
+                    ->label("Tenant")
+                    ->content(fn (MaintenanceTicket $record): string => $record->tenant
+                        ? $record->tenant->name . " — " . ($record->tenant->phone ?? "no phone") . " · " . ($record->tenant->email ?? "no email")
+                        : "Not matched"),
+                Placeholder::make("property")
+                    ->label("Property")
+                    ->content(fn (MaintenanceTicket $record): string => $record->property
+                        ? $record->property->title
+                            . ($record->propertyUnit?->unit ? " — Unit " . $record->propertyUnit->unit : "")
+                            . ", " . ($record->property->city ?? "")
+                            . " " . ($record->property->province ?? "")
+                        : "Not matched"),
                 TextInput::make("title")->label("Title")->disabled(),
                 Textarea::make("description")->label("Description")->disabled(),
                 Select::make("status")
