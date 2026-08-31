@@ -23,6 +23,26 @@ Route::get("/contact", [WebsiteController::class, "contact"])->name("contact");
 Route::post("/contact", [WebsiteController::class, "contactSubmit"])->name("contact.submit");
 Route::get("/portals", [WebsiteController::class, "portals"])->name("portals");
 
+// Twilio voice handling (inbound calls)
+Route::post("/twilio/voice", [App\Http\Controllers\TwilioVoiceController::class, "voice"])
+    ->middleware("twilio.signature")
+    ->name("twilio.voice");
+Route::post("/twilio/gather", [App\Http\Controllers\TwilioVoiceController::class, "gather"])
+    ->middleware("twilio.signature")
+    ->name("twilio.gather");
+Route::post("/twilio/maintenance", [App\Http\Controllers\TwilioVoiceController::class, "maintenanceIssue"])
+    ->middleware("twilio.signature")
+    ->name("twilio.maintenance");
+Route::post("/twilio/escalate", [App\Http\Controllers\TwilioVoiceController::class, "escalate"])
+    ->middleware("twilio.signature")
+    ->name("twilio.escalate");
+Route::post("/twilio/dial-result", [App\Http\Controllers\TwilioVoiceController::class, "dialResult"])
+    ->middleware("twilio.signature")
+    ->name("twilio.dial-result");
+Route::post("/twilio/record", [App\Http\Controllers\TwilioVoiceController::class, "record"])
+    ->middleware("twilio.signature")
+    ->name("twilio.record");
+
 // Stripe payment processing
 Route::post("/api/stripe/create-intent", [StripePaymentController::class, "createPaymentIntent"])
     ->middleware(["web", "auth"])
