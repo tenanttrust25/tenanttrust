@@ -26,7 +26,8 @@ class OutstandingInvoices extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Invoice::query()->whereIn('status', ['pending', 'overdue']))
+            ->query(Invoice::query()->whereIn('status', ['pending', 'overdue'])
+                ->withSum(['payments as paid_sum' => fn ($q) => $q->where('status', 'completed')], 'amount'))
             ->columns([
                 TextColumn::make('invoice_number')
                     ->label('Invoice #')
@@ -41,9 +42,18 @@ class OutstandingInvoices extends Page implements HasTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('amount')
-                    ->label('Amount')
+                    ->label('Invoice Amount')
                     ->money('CAD')
                     ->sortable(),
+                TextColumn::make('paid_sum')
+                    ->label('Paid')
+                    ->money('CAD')
+                    ->sortable(),
+                TextColumn::make('outstanding')
+                    ->label('Outstanding')
+                    ->money('CAD')
+                    ->state(fn ($record) => max(0, (float) $record->amount - (float) ($record->paid_sum ?? 0)))
+                    ->color(fn ($record) => ((float) $record->amount - (float) ($record->paid_sum ?? 0)) > 0 ? 'danger' : 'success'),
                 TextColumn::make('due_date')
                     ->label('Due Date')
                     ->date()
