@@ -28,6 +28,13 @@ class RentalApplicationController extends Controller
 
     public function store(Request $request)
     {
+        // Spoofed submissions using Tenant Trust's own domain are silently
+        // dropped — real applicants never email us from @tenanttrust.ca.
+        if (\App\Services\EmailDomainGuard::isBlocked($request->input('email'))
+            || \App\Services\EmailDomainGuard::isBlocked($request->input('co_applicant_email'))) {
+            return redirect()->route('rental-application.thank-you');
+        }
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',

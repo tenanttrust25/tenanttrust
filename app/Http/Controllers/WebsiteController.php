@@ -93,7 +93,10 @@ class WebsiteController extends Controller
     {
         // Honeypot trap: real humans never see the hidden "company_website"
         // field, so if it's filled this is a bot. Pretend success, store nothing.
-        if ($request->filled('company_website')) {
+        // Same for submissions spoofing Tenant Trust's own domain
+        // (e.g. info@tenanttrust.ca) — real visitors never email us from
+        // our own domain, only spammers do.
+        if ($request->filled('company_website') || \App\Services\EmailDomainGuard::isBlocked($request->input('email'))) {
             return back()->with('success', 'Thank you! Your message has been received. We will get back to you shortly.');
         }
 
