@@ -22,6 +22,11 @@
 
                     <form method="POST" action="{{ route('contact.submit') }}">
                         @csrf
+                        <!-- Honeypot: invisible to humans; bots auto-fill it. If filled, the server silently drops the submission. -->
+                        <div style="position:absolute !important; left:-9999px !important; width:1px; height:1px; overflow:hidden;" aria-hidden="true">
+                            <label for="company_website">Company Website</label>
+                            <input type="text" id="company_website" name="company_website" tabindex="-1" autocomplete="off">
+                        </div>
                         <div class="form-group">
                             <label for="name">Full Name</label>
                             <input type="text" id="name" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
@@ -41,6 +46,12 @@
                             <label for="message">Message</label>
                             <textarea id="message" name="message" class="form-control @error('message') is-invalid @enderror" required>{{ old('message') }}</textarea>
                             @error('message') <div class="form-error">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="captcha">Security check: What is {{ $captcha['question'] }}?</label>
+                            <input type="text" id="captcha" name="captcha" class="form-control @error('captcha') is-invalid @enderror" placeholder="Type your answer" autocomplete="off" inputmode="numeric" required>
+                            <div class="form-hint">Prove you're not a robot — answer in numbers (e.g. 4).</div>
+                            @error('captcha') <div class="form-error">{{ $message }}</div> @enderror
                         </div>
                         <button type="submit" class="btn btn-gold">Send Message</button>
                     </form>

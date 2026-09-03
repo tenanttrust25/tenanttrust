@@ -58,17 +58,59 @@ class WebsiteController extends Controller
 
     public function contact()
     {
-        return view('contact');
+        $captcha = $this->generateCaptcha();
+
+        return view('contact', compact('captcha'));
+    }
+
+    /**
+     * Generate a fresh arithmetic CAPTCHA question (word-form, so naive
+     * scrapers can't regex the operands) and stash the answer in the session.
+     */
+    private function generateCaptcha(): array
+    {
+        $words = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+        $plus = (bool) random_int(0, 1);
+
+        if ($plus) {
+            $a = random_int(1, 10);
+            $b = random_int(1, 10);
+            $answer = $a + $b;
+            $op = 'plus';
+        } else {
+            $a = random_int(2, 10);
+            $b = random_int(1, $a - 1);
+            $answer = $a - $b;
+            $op = 'minus';
+        }
+
+        session(['contact_captcha_answer' => (string) $answer]);
+
+        return ['question' => "{$words[$a - 1]} {$op} {$words[$b - 1]}"];
     }
 
     public function contactSubmit(Request $request)
     {
+        // Honeypot trap: real humans never see the hidden "company_website"
+        // field, so if it's filled this is a bot. Pretend success, store nothing.
+        if ($request->filled('company_website')) {
+            return back()->with('success', 'Thank you! Your message has been received. We will get back to you shortly.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|max:20',
             'message' => 'required',
+            'captcha' => ['required', function ($attribute, $value, $fail) {
+                $expected = session('contact_captcha_answer');
+                session()->forget('contact_captcha_answer'); // single-use
+                if ($expected === null || (string) $value === '' || (int) $value !== (int) $expected) {
+                    $fail('The security check answer is incorrect. Please try again.');
+                }
+            }],
         ]);
+        unset($validated['captcha']);
 
         $submission = ContactSubmission::create($validated);
 

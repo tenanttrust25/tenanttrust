@@ -680,6 +680,7 @@
 
         /* Error / Success states */
         .form-error { color: #dc2626; font-size: 0.8rem; margin-top: 4px; }
+        .form-hint { color: #6b7280; font-size: 0.8rem; margin-top: 4px; }
 
         /* Page content from CMS */
         .page-content h1, .page-content h2, .page-content h3 {

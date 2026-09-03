@@ -20,7 +20,7 @@ Route::get("/apply", [RentalApplicationController::class, "create"])->name("rent
 Route::post("/apply", [RentalApplicationController::class, "store"])->name("rental-application.store");
 Route::get("/apply/thank-you", [RentalApplicationController::class, "thankYou"])->name("rental-application.thank-you");
 Route::get("/contact", [WebsiteController::class, "contact"])->name("contact");
-Route::post("/contact", [WebsiteController::class, "contactSubmit"])->name("contact.submit");
+Route::post("/contact", [WebsiteController::class, "contactSubmit"])->middleware("throttle:10,1")->name("contact.submit");
 Route::get("/portals", [WebsiteController::class, "portals"])->name("portals");
 
 // Twilio voice handling (inbound calls)
