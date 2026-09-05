@@ -24,7 +24,7 @@ class UserResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getEloquentQuery()
-            ->whereIn("role", ["manager", "owner", "admin", "tenant"]);
+            ->whereIn("role", ["manager", "owner", "admin", "tenant", "previous_tenant"]);
     }
 
     public static function form(Form $form): Form
@@ -55,6 +55,7 @@ class UserResource extends Resource
                         "manager" => "Property Manager",
                         "owner" => "Client (Owner)",
                         "tenant" => "Tenant",
+                        "previous_tenant" => "Previous Tenant",
                     ])
                     ->required(fn (string $operation): bool => $operation === "create")
                     ->default("owner"),
@@ -93,6 +94,17 @@ class UserResource extends Resource
                     ->label("End Date")
                     ->native(false)
                     ->displayFormat("M d, Y"),
+
+                Forms\Components\Section::make("Private Notes")
+                    ->description("Visible to admins only — tenants and managers never see this.")
+                    ->icon("heroicon-o-lock-closed")
+                    ->schema([
+                        Forms\Components\Textarea::make("private_notes")
+                            ->label("")
+                            ->rows(4)
+                            ->placeholder("Internal notes about this user (e.g. payment history quirks, LTB history, special arrangements)...")
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -113,11 +125,14 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make("role")
                     ->label("Role")
+                    ->sortable()
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         "admin" => "danger",
                         "manager" => "warning",
                         "owner" => "info",
+                        "tenant" => "gray",
+                        "previous_tenant" => "secondary",
                         default => "gray",
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
@@ -125,6 +140,7 @@ class UserResource extends Resource
                         "manager" => "Property Manager",
                         "owner" => "Client",
                         "tenant" => "Tenant",
+                        "previous_tenant" => "Previous Tenant",
                         default => ucfirst($state),
                     }),
                 Tables\Columns\TextColumn::make("created_at")
@@ -148,6 +164,7 @@ class UserResource extends Resource
                         "manager" => "Property Manager",
                         "owner" => "Client",
                         "tenant" => "Tenant",
+                        "previous_tenant" => "Previous Tenant",
                     ]),
             ])
             ->actions([
@@ -173,6 +190,8 @@ class UserResource extends Resource
             \App\Filament\Admin\Resources\UserResource\RelationManagers\InvoicesRelationManager::class,
             \App\Filament\Admin\Resources\UserResource\RelationManagers\PaymentsRelationManager::class,
             \App\Filament\Admin\Resources\UserResource\RelationManagers\TenantFilesRelationManager::class,
+            \App\Filament\Admin\Resources\UserResource\RelationManagers\FormSubmissionsRelationManager::class,
+            \App\Filament\Admin\Resources\UserResource\RelationManagers\RemindersRelationManager::class,
         ];
     }
 }

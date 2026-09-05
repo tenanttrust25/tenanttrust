@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(["name", "email", "password", "role", "phone", "address", "start_date", "end_date", "stripe_account_id", "stripe_onboarding_complete", "stripe_account_created_at"])]
+#[Fillable(["name", "email", "password", "role", "phone", "address", "mailing_address", "start_date", "end_date", "private_notes", "stripe_account_id", "stripe_onboarding_complete", "stripe_account_created_at"])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -56,6 +56,16 @@ class User extends Authenticatable
     public function tenantFiles(): HasMany
     {
         return $this->hasMany(TenantFile::class, 'tenant_id');
+    }
+
+    public function formSubmissions(): HasMany
+    {
+        return $this->hasMany(FormSubmission::class, 'tenant_id');
+    }
+
+    public function reminders(): HasMany
+    {
+        return $this->hasMany(Reminder::class, 'tenant_id');
     }
 
     public function uploadedFiles(): HasMany
