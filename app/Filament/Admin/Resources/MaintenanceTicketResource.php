@@ -14,6 +14,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\DeleteAction;
 
 class MaintenanceTicketResource extends Resource
 {
@@ -111,6 +112,11 @@ class MaintenanceTicketResource extends Resource
             ])
             ->actions([
                 EditAction::make(),
+                DeleteAction::make()
+                    ->label("Delete")
+                    ->icon("heroicon-o-trash")
+                    ->color("danger")
+                    ->requiresConfirmation(),
             ])
             ->defaultSort("created_at", "desc");
     }
