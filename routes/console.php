@@ -13,3 +13,18 @@ Artisan::command('inspire', function () {
 Schedule::command('invoices:mark-overdue')
     ->monthlyOn(2, '00:00')
     ->timezone(config('app.timezone'));
+
+// Every morning at 12:15 AM, any tenant whose user end_date has passed
+// gets flipped to previous_tenant (keeping the same tenant portal login).
+// The end_date set on the user record is the source of truth — lease fields
+// are irrelevant. E.g. end_date Aug 31 → flips on Sep 1.
+Schedule::command('tenants:mark-previous')
+    ->dailyAt('00:15')
+    ->timezone(config('app.timezone'));
+
+// Twice daily (8 AM + 5 PM): email admins about reminders whose remind date
+// has arrived and are not yet completed (each reminder emails once, guarded
+// by notified_at). The admin red bar shows the same due set until completed.
+Schedule::command('reminders:notify-due')
+    ->twiceDaily(8, 17)
+    ->timezone(config('app.timezone'));

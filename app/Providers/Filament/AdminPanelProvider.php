@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Admin\Pages\AdminDashboard;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -11,6 +12,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentView;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -56,5 +58,25 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
                 "role.admin",
             ]);
+    }
+
+    public function boot(): void
+    {
+        // Red "reminders due" bar at the top of every admin page (hook is global
+        // across panels, so guard by panel id + authentication).
+        FilamentView::registerRenderHook(
+            'panels::content.start',
+            function (): string {
+                if (Filament::getCurrentPanel()?->getId() !== 'admin') {
+                    return '';
+                }
+
+                if (! auth()->check()) {
+                    return '';
+                }
+
+                return view('filament.admin.reminders-due-bar')->render();
+            },
+        );
     }
 }
