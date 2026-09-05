@@ -143,7 +143,7 @@ class FormFillService
                 'n1_tenant_name_address' => $ctx['tenant_names'],
                 'n1_landlord_name_address' => $ctx['landlord_name'],
                 'n1_unit_address' => $ctx['unit_address'],
-                'n1_on_date' => $today,
+                'n1_on_date' => $this->n1EffectiveDate($ctx['today'])->toDateString(),
                 'n1_period' => 'month',
                 'n1_increase_period' => 'month',
                 'n1_guideline' => 'less_equal',
@@ -305,6 +305,19 @@ class FormFillService
     // N1 — Notice of Rent Increase
     // ------------------------------------------------------------------
 
+    /** N1 rent-increase effective date: 1st of a month, at least 90 days out. */
+    protected function n1EffectiveDate(Carbon $today): Carbon
+    {
+        $effective = $today->copy()->addMonthsNoOverflow(3)->startOfMonth();
+
+        // If +3 months snapped back before the 90-day minimum, roll to the next 1st.
+        if ($effective->lt($today->copy()->addDays(90))) {
+            $effective->addMonthNoOverflow();
+        }
+
+        return $effective;
+    }
+
     protected function n1Schema(array $ctx): array
     {
         return [
@@ -315,7 +328,7 @@ class FormFillService
             TextInput::make('n1_unit_address')->label('Address of the Rental Unit')
                 ->default($ctx['unit_address'])->columnSpanFull(),
             DatePicker::make('n1_on_date')->label('Rent increase effective date (On…)')
-                ->native(false)->displayFormat('M d, Y')->default($ctx['today']),
+                ->native(false)->displayFormat('M d, Y')->default($this->n1EffectiveDate(Carbon::parse($ctx['today']))),
             TextInput::make('n1_new_rent_amount')->label('New rent amount ($)')->numeric(),
             Select::make('n1_period')->label('New rent period')->options(['month' => 'per month', 'week' => 'per week', 'other' => 'other (specify)'])
                 ->default('month')->live(),
