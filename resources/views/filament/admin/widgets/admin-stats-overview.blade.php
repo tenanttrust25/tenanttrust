@@ -1,88 +1,119 @@
 <x-filament-widgets::widget>
+    <style>
+        /* Self-contained dashboard styles — no Tailwind dependency (app ships no compiled CSS) */
+        .ttdash { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 4px 0 18px; }
+        .ttdash .c { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; box-shadow: 0 1px 2px rgba(15, 23, 42, .06); min-width: 0; }
+        .ttdash .l { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ttdash .n { font-size: 22px; font-weight: 800; line-height: 1.2; margin-top: 2px; color: #0f172a; }
+        .ttdash .s { font-size: 11.5px; color: #6b7280; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ttdash .c.green  { border-color: #d1fae5; } .ttdash .green .n  { color: #059669; }
+        .ttdash .c.orange { border-color: #fed7aa; } .ttdash .orange .n { color: #ea580c; }
+        .ttdash .c.red    { border-color: #fecaca; } .ttdash .red .n    { color: #dc2626; }
+        .ttdash .c.blue   { border-color: #bfdbfe; } .ttdash .blue .n   { color: #2563eb; }
+        .ttdash .c.purple { border-color: #ddd6fe; } .ttdash .purple .n { color: #7c3aed; }
+        html.dark .ttdash .c { background: #1e293b; border-color: #334155; box-shadow: none; }
+        html.dark .ttdash .l, html.dark .ttdash .s { color: #94a3b8; }
+        html.dark .ttdash .n { color: #f1f5f9; }
+        @media (max-width: 1100px) { .ttdash { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 560px)  { .ttdash { grid-template-columns: 1fr; } }
+        .ttsec-title { font-size: 14px; font-weight: 600; color: #374151; margin: 4px 0 10px; }
+        html.dark .ttsec-title { color: #e5e7eb; }
+        .tttbl { width: 100%; border-collapse: collapse; font-size: 13.5px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+        html.dark .tttbl { border-color: #334155; }
+        .tttbl th { text-align: left; padding: 9px 12px; background: #f9fafb; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+        html.dark .tttbl th { background: #0f172a; color: #94a3b8; border-bottom-color: #334155; }
+        .tttbl td { padding: 9px 12px; border-bottom: 1px solid #f3f4f6; color: #111827; }
+        html.dark .tttbl td { border-bottom-color: #1e293b; color: #e5e7eb; }
+        .tttbl tr:last-child td { border-bottom: none; }
+        .tttbl tr:hover td { background: #f9fafb; }
+        html.dark .tttbl tr:hover td { background: #1e293b; }
+        .tttbl .r { text-align: right; }
+        .tttbl .ctr { text-align: center; }
+        .ttpill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600; }
+        .ttpill.paid { background: #d1fae5; color: #047857; }
+        .ttpill.pending { background: #fef3c7; color: #b45309; }
+        .ttpill.overdue { background: #fee2e2; color: #b91c1c; }
+        .ttpill.cancelled { background: #f3f4f6; color: #6b7280; }
+    </style>
+
     <x-filament::section>
         <x-slot name="heading">
-            <div class="flex items-center justify-between">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
                 <span>🏢 Site Overview</span>
             </div>
         </x-slot>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-4">
-            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-sm">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Properties</div>
-                <div class="mt-0.5 text-xl font-bold text-gray-900 dark:text-white">{{ $totalProperties }}</div>
-                <div class="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">{{ $occupiedUnits }} occupied</div>
+
+        <div class="ttdash">
+            <div class="c">
+                <div class="l">Properties</div>
+                <div class="n">{{ $totalProperties }}</div>
+                <div class="s">{{ $occupiedUnits }} occupied</div>
             </div>
-            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-sm">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Tenants</div>
-                <div class="mt-0.5 text-xl font-bold text-gray-900 dark:text-white">{{ $totalTenants }}</div>
-                <div class="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">{{ $totalOwners }} owners · {{ $previousTenants }} previous</div>
+            <div class="c">
+                <div class="l">Tenants</div>
+                <div class="n">{{ $totalTenants }}</div>
+                <div class="s">{{ $totalOwners }} owners · {{ $previousTenants }} previous</div>
             </div>
-            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-sm">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Monthly Revenue</div>
-                <div class="mt-0.5 text-xl font-bold text-success-600">${{ number_format($monthlyRevenue) }}</div>
+            <div class="c green">
+                <div class="l">Monthly Revenue</div>
+                <div class="n">${{ number_format($monthlyRevenue) }}</div>
             </div>
-            <div class="rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-gray-800 p-3">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-purple-600 dark:text-purple-300">Management Fees</div>
-                <div class="mt-0.5 text-xl font-bold text-purple-600 dark:text-purple-300">${{ number_format($monthlyManagementFees, 2) }}</div>
-                <div class="mt-0.5 text-[11px] text-purple-500 dark:text-purple-400">${{ number_format($ytdManagementFees, 2) }} YTD</div>
+            <div class="c purple">
+                <div class="l">Mgmt Fees</div>
+                <div class="n">${{ number_format($monthlyManagementFees, 2) }}</div>
+                <div class="s">${{ number_format($ytdManagementFees, 2) }} YTD</div>
+            </div>
+            <div class="c orange">
+                <div class="l">Pending Invoices</div>
+                <div class="n">{{ $pendingInvoices }}</div>
+            </div>
+            <div class="c red">
+                <div class="l">Overdue</div>
+                <div class="n">{{ $overdueInvoices }}</div>
+                <div class="s">${{ number_format($overdueAmount) }} total</div>
+            </div>
+            <div class="c blue">
+                <div class="l">Open Tickets</div>
+                <div class="n">{{ $openTickets }}</div>
+            </div>
+            <div class="c {{ $dueReminders > 0 ? 'red' : '' }}">
+                <div class="l">Reminders</div>
+                <div class="n">{{ $totalReminders }}</div>
+                <div class="s">{{ $dueReminders }} due now</div>
             </div>
         </div>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-4">
-            <div class="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-gray-800 p-3">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-orange-600 dark:text-orange-300">Pending Invoices</div>
-                <div class="mt-0.5 text-xl font-bold text-orange-600 dark:text-orange-300">{{ $pendingInvoices }}</div>
-            </div>
-            <div class="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-gray-800 p-3">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-red-600 dark:text-red-300">Overdue</div>
-                <div class="mt-0.5 text-xl font-bold text-red-600 dark:text-red-300">{{ $overdueInvoices }}</div>
-                <div class="mt-0.5 text-[11px] text-red-500 dark:text-red-400">${{ number_format($overdueAmount) }} total</div>
-            </div>
-            <div class="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-gray-800 p-3">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-blue-600 dark:text-blue-300">Open Tickets</div>
-                <div class="mt-0.5 text-xl font-bold text-blue-600 dark:text-blue-300">{{ $openTickets }}</div>
-            </div>
-            <div class="rounded-xl border border-{{ $dueReminders > 0 ? 'red-200 dark:border-red-800 bg-red-50' : 'gray-200 dark:border-gray-700 bg-white dark:bg-gray-800' }} p-3">
-                <div class="text-[11px] font-medium uppercase tracking-wide {{ $dueReminders > 0 ? 'text-red-600 dark:text-red-300' : 'text-gray-500 dark:text-gray-400' }}">Reminders</div>
-                <div class="mt-0.5 text-xl font-bold {{ $dueReminders > 0 ? 'text-red-600 dark:text-red-300' : 'text-gray-900 dark:text-white' }}">{{ $totalReminders }}</div>
-                <div class="mt-0.5 text-[11px] {{ $dueReminders > 0 ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400' }}">{{ $dueReminders }} due now</div>
-            </div>
-        </div>
+
         <div>
-            <h3 class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Recent Invoices</h3>
+            <h3 class="ttsec-title">Recent Invoices</h3>
             @if(count($recentInvoices) > 0)
-                <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50 dark:bg-gray-900">
+                <table class="tttbl">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Tenant</th>
+                            <th>Property</th>
+                            <th class="r">Amount</th>
+                            <th class="ctr">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($recentInvoices as $inv)
                             <tr>
-                                <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Invoice #</th>
-                                <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Tenant</th>
-                                <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Property</th>
-                                <th class="px-4 py-3 text-right font-medium text-gray-500 dark:text-gray-400">Amount</th>
-                                <th class="px-4 py-3 text-center font-medium text-gray-500 dark:text-gray-400">Status</th>
+                                <td>{{ $inv->invoice_number }}</td>
+                                <td>{{ $inv->tenant?->name }}</td>
+                                <td>{{ $inv->property?->title }}</td>
+                                <td class="r">${{ number_format($inv->amount, 2) }}</td>
+                                <td class="ctr">
+                                    <span class="ttpill {{ $inv->status === "paid" ? "paid" : "" }}{{ $inv->status === "pending" ? "pending" : "" }}{{ $inv->status === "overdue" ? "overdue" : "" }}{{ $inv->status === "cancelled" ? "cancelled" : "" }}">
+                                        {{ $inv->status === "pending" ? "Unpaid" : ucfirst($inv->status) }}
+                                    </span>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @foreach($recentInvoices as $inv)
-                                <tr class="hover:bg-gray-50 dark:bg-gray-900">
-                                    <td class="px-4 py-3 font-medium">{{ $inv->invoice_number }}</td>
-                                    <td class="px-4 py-3">{{ $inv->tenant?->name }}</td>
-                                    <td class="px-4 py-3">{{ $inv->property?->title }}</td>
-                                    <td class="px-4 py-3 text-right">${{ number_format($inv->amount, 2) }}</td>
-                                    <td class="px-4 py-3 text-center">
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold
-                                            {{ $inv->status === "paid" ? "bg-green-100 text-green-700" : "" }}
-                                            {{ $inv->status === "pending" ? "bg-yellow-100 text-yellow-700" : "" }}
-                                            {{ $inv->status === "overdue" ? "bg-red-100 text-red-700" : "" }}
-                                            {{ $inv->status === "cancelled" ? "bg-gray-100 text-gray-500" : "" }}">
-                                            {{ $inv->status === "pending" ? "Unpaid" : ucfirst($inv->status) }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             @else
-                <p class="py-4 text-center text-sm text-gray-400 dark:text-gray-500">No invoices yet.</p>
+                <p style="padding:16px;text-align:center;font-size:13px;color:#9ca3af;">No invoices yet.</p>
             @endif
         </div>
     </x-filament::section>
