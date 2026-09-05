@@ -8,6 +8,7 @@ use App\Models\PropertyUnit;
 use App\Models\User;
 use App\Models\Tenancy;
 use App\Models\MaintenanceTicket;
+use App\Models\Reminder;
 use Filament\Widgets\Widget;
 
 class AdminStatsOverview extends Widget
@@ -22,6 +23,7 @@ class AdminStatsOverview extends Widget
         $occupiedUnits = Tenancy::where('status', 'active')->count();
         $totalTenants = User::where('role', 'tenant')->count();
         $totalOwners = User::where('role', 'owner')->count();
+        $previousTenants = User::where('role', 'previous_tenant')->count();
 
         $monthlyRevenue = Invoice::where('status', 'paid')
             ->whereMonth('due_date', now()->month)
@@ -33,6 +35,9 @@ class AdminStatsOverview extends Widget
         $overdueAmount = Invoice::where('status', 'overdue')->sum('amount');
 
         $openTickets = MaintenanceTicket::whereIn('status', ['open', 'in_progress'])->count();
+
+        $dueReminders = Reminder::query()->due()->count();
+        $totalReminders = Reminder::whereNull('completed_at')->count();
 
         // Management Fees
         $monthsYtd = now()->month;
@@ -57,11 +62,14 @@ class AdminStatsOverview extends Widget
             'occupiedUnits' => $occupiedUnits,
             'totalTenants' => $totalTenants,
             'totalOwners' => $totalOwners,
+            'previousTenants' => $previousTenants,
             'monthlyRevenue' => $monthlyRevenue,
             'pendingInvoices' => $pendingInvoices,
             'overdueInvoices' => $overdueInvoices,
             'overdueAmount' => $overdueAmount,
             'openTickets' => $openTickets,
+            'dueReminders' => $dueReminders,
+            'totalReminders' => $totalReminders,
             'ytdManagementFees' => $ytdManagementFees,
             'monthlyManagementFees' => $monthlyManagementFees,
             'recentInvoices' => $recentInvoices,

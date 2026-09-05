@@ -14,6 +14,7 @@
             <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
                 <div class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Tenants</div>
                 <div class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ $totalTenants }}</div>
+                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $previousTenants }} previous</div>
             </div>
             <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
                 <div class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Owners</div>
@@ -35,7 +36,7 @@
                 <div class="mt-1 text-xs text-indigo-500 dark:text-indigo-400">Jan - {{ now()->format("M") }}</div>
             </div>
         </div>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
             <div class="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-gray-800 p-4">
                 <div class="text-xs font-medium uppercase tracking-wide text-orange-600 dark:text-orange-300">Pending Invoices</div>
                 <div class="mt-1 text-2xl font-bold text-orange-600 dark:text-orange-300">{{ $pendingInvoices }}</div>
@@ -48,6 +49,11 @@
             <div class="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-gray-800 p-4">
                 <div class="text-xs font-medium uppercase tracking-wide text-blue-600 dark:text-blue-300">Open Tickets</div>
                 <div class="mt-1 text-2xl font-bold text-blue-600 dark:text-blue-300">{{ $openTickets }}</div>
+            </div>
+            <div class="rounded-xl border border-{{ $dueReminders > 0 ? 'red-200 dark:border-red-800 bg-red-50' : 'gray-200 dark:border-gray-700 bg-white dark:bg-gray-800' }} p-4">
+                <div class="text-xs font-medium uppercase tracking-wide {{ $dueReminders > 0 ? 'text-red-600 dark:text-red-300' : 'text-gray-500 dark:text-gray-400' }}">Reminders</div>
+                <div class="mt-1 text-2xl font-bold {{ $dueReminders > 0 ? 'text-red-600 dark:text-red-300' : 'text-gray-900 dark:text-white' }}">{{ $totalReminders }}</div>
+                <div class="mt-1 text-xs {{ $dueReminders > 0 ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400' }}">{{ $dueReminders }} due now</div>
             </div>
         </div>
         <div>
