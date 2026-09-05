@@ -14,26 +14,16 @@
             <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-sm">
                 <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Tenants</div>
                 <div class="mt-0.5 text-xl font-bold text-gray-900 dark:text-white">{{ $totalTenants }}</div>
-                <div class="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">{{ $previousTenants }} previous</div>
-            </div>
-            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-sm">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Owners</div>
-                <div class="mt-0.5 text-xl font-bold text-gray-900 dark:text-white">{{ $totalOwners }}</div>
+                <div class="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">{{ $totalOwners }} owners · {{ $previousTenants }} previous</div>
             </div>
             <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-sm">
                 <div class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Monthly Revenue</div>
                 <div class="mt-0.5 text-xl font-bold text-success-600">${{ number_format($monthlyRevenue) }}</div>
             </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-4">
             <div class="rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-gray-800 p-3">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-purple-600 dark:text-purple-300">Monthly Mgmt Fees</div>
+                <div class="text-[11px] font-medium uppercase tracking-wide text-purple-600 dark:text-purple-300">Management Fees</div>
                 <div class="mt-0.5 text-xl font-bold text-purple-600 dark:text-purple-300">${{ number_format($monthlyManagementFees, 2) }}</div>
-            </div>
-            <div class="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-gray-800 p-3">
-                <div class="text-[11px] font-medium uppercase tracking-wide text-indigo-600 dark:text-indigo-300">YTD Mgmt Fees</div>
-                <div class="mt-0.5 text-xl font-bold text-indigo-600 dark:text-indigo-300">${{ number_format($ytdManagementFees, 2) }}</div>
-                <div class="mt-0.5 text-[11px] text-indigo-500 dark:text-indigo-400">Jan - {{ now()->format("M") }}</div>
+                <div class="mt-0.5 text-[11px] text-purple-500 dark:text-purple-400">${{ number_format($ytdManagementFees, 2) }} YTD</div>
             </div>
         </div>
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-4">
