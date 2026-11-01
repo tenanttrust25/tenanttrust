@@ -15,6 +15,7 @@ Route::get("/install", [InstallController::class, "index"])->name("install");
 Route::post("/install/run", [InstallController::class, "run"])->name("install.run");
 Route::get("/properties", [WebsiteController::class, "properties"])->name("properties.index");
 Route::get("/properties/{slug}", [WebsiteController::class, "propertyDetail"])->name("properties.show");
+Route::get("/properties/{slug}/inquire", [WebsiteController::class, "propertyInquire"])->name("properties.inquire");
 Route::get("/about", [WebsiteController::class, "about"])->name("about");
 Route::get("/apply", [RentalApplicationController::class, "create"])->name("rental-application.create");
 Route::post("/apply", [RentalApplicationController::class, "store"])->name("rental-application.store");
@@ -42,6 +43,12 @@ Route::post("/twilio/escalate", [App\Http\Controllers\TwilioVoiceController::cla
 Route::post("/twilio/dial-result", [App\Http\Controllers\TwilioVoiceController::class, "dialResult"])
     ->middleware("twilio.signature")
     ->name("twilio.dial-result");
+Route::post("/twilio/whisper", [App\Http\Controllers\TwilioVoiceController::class, "whisper"])
+    ->middleware("twilio.signature")
+    ->name("twilio.whisper");
+Route::post("/twilio/askname", [App\Http\Controllers\TwilioVoiceController::class, "askName"])
+    ->middleware("twilio.signature")
+    ->name("twilio.askname");
 Route::post("/twilio/record", [App\Http\Controllers\TwilioVoiceController::class, "record"])
     ->middleware("twilio.signature")
     ->name("twilio.record");
@@ -136,6 +143,54 @@ Route::post('/push/unsubscribe', [\App\Http\Controllers\PushSubscriptionControll
 Route::get('/tenant/sw.js', fn () => response(file_get_contents(public_path('pwa/sw.js')))
     ->header('Content-Type', 'application/javascript')
     ->header('Cache-Control', 'no-cache'));
+Route::get('/admin/sw.js', fn () => response(file_get_contents(public_path('pwa/sw.js')))
+    ->header('Content-Type', 'application/javascript')
+    ->header('Cache-Control', 'no-cache'));
+Route::get('/manager/sw.js', fn () => response(file_get_contents(public_path('pwa/sw.js')))
+    ->header('Content-Type', 'application/javascript')
+    ->header('Cache-Control', 'no-cache'));
+
+Route::get('/pwa/admin-manifest.webmanifest', function () {
+    $manifest = [
+        'name' => 'Tenant Trust — Admin',
+        'short_name' => 'Admin',
+        'description' => 'Tenant Trust administration — properties, people, billing and operations.',
+        'start_url' => '/admin',
+        'scope' => '/admin',
+        'display' => 'standalone',
+        'orientation' => 'portrait',
+        'background_color' => '#0F172A',
+        'theme_color' => '#DCA54A',
+        'icons' => [
+            ['src' => '/pwa/icons/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png'],
+            ['src' => '/pwa/icons/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png'],
+            ['src' => '/pwa/icons/icon-maskable-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+            ['src' => '/pwa/icons/icon-maskable-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+        ],
+    ];
+    return response()->json($manifest)->header('Content-Type', 'application/manifest+json');
+});
+
+Route::get('/pwa/manager-manifest.webmanifest', function () {
+    $manifest = [
+        'name' => 'Tenant Trust — Manager',
+        'short_name' => 'Manager',
+        'description' => 'Property Manager Portal — maintenance, leasing and rent operations.',
+        'start_url' => '/manager',
+        'scope' => '/manager',
+        'display' => 'standalone',
+        'orientation' => 'portrait',
+        'background_color' => '#0F172A',
+        'theme_color' => '#DCA54A',
+        'icons' => [
+            ['src' => '/pwa/icons/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png'],
+            ['src' => '/pwa/icons/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png'],
+            ['src' => '/pwa/icons/icon-maskable-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+            ['src' => '/pwa/icons/icon-maskable-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+        ],
+    ];
+    return response()->json($manifest)->header('Content-Type', 'application/manifest+json');
+});
 Route::get('/owner/sw.js', fn () => response(file_get_contents(public_path('pwa/sw.js')))
     ->header('Content-Type', 'application/javascript')
     ->header('Cache-Control', 'no-cache'));

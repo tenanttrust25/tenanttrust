@@ -30,3 +30,9 @@ public/site
 -e 
 # Local DB backups
 /database/backups
+
+# Local backups / agent artifacts
+.env.bak-*
+*.bak-*
+/backups/
+/storage/tools-leads/

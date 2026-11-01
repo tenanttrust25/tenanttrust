@@ -29,6 +29,8 @@ class RentalApplication extends Model
         'consent_credit_check',
         'consent_background_check',
         'status',
+        'decline_reasons',
+        'decline_notes',
         // Co-applicant
         'co_applicant_name',
         'co_applicant_email',
@@ -96,11 +98,56 @@ class RentalApplication extends Model
         'refused_rent' => 'boolean',
         'date_hired' => 'date',
         'signature_date' => 'date',
+        'decline_reasons' => 'array',
     ];
 
     public function propertyUnit(): BelongsTo
     {
         return $this->belongsTo(PropertyUnit::class, 'property_unit_id');
+    }
+
+    /**
+     * The owner (landlord) of the property this application is for, when the
+     * unit is linked to a property that has an owner on file.
+     */
+    public function owner(): ?User
+    {
+        return $this->propertyUnit?->property?->owner;
+    }
+
+    /**
+     * A valid owner email address for this application, or null.
+     */
+    public function ownerEmail(): ?string
+    {
+        $email = $this->owner()?->email;
+
+        return ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) ? $email : null;
+    }
+
+    /**
+     * The co-owner of the property this application is for, when set.
+     */
+    public function coOwner(): ?User
+    {
+        return $this->propertyUnit?->property?->coOwner;
+    }
+
+    /**
+     * Every valid owner/co-owner email for this application (unique).
+     */
+    public function ownerEmails(): array
+    {
+        $emails = [];
+
+        foreach ([$this->owner(), $this->coOwner()] as $user) {
+            $email = $user?->email;
+            if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $emails[] = $email;
+            }
+        }
+
+        return array_values(array_unique($emails));
     }
 
     public function getFullNameAttribute(): string

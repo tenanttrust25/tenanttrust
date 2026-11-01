@@ -8,6 +8,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -36,6 +37,17 @@ class AdminPanelProvider extends PanelProvider
                 "gray" => Color::Slate,
             ])
             ->darkMode(true)
+            ->collapsibleNavigationGroups(true)
+            ->navigationGroups([
+                NavigationGroup::make('Properties'),
+                NavigationGroup::make('People'),
+                NavigationGroup::make('Leasing'),
+                NavigationGroup::make('Rent & Billing'),
+                NavigationGroup::make('Owner Finance'),
+                NavigationGroup::make('Operations'),
+                NavigationGroup::make('Mail'),
+                NavigationGroup::make('Website'),
+            ])
             ->discoverResources(in: app_path("Filament/Admin/Resources"), for: "App\\Filament\\Admin\\Resources")
             ->discoverPages(in: app_path("Filament/Admin/Pages"), for: "App\\Filament\\Admin\\Pages")
             ->pages([
@@ -76,6 +88,39 @@ class AdminPanelProvider extends PanelProvider
                 }
 
                 return view('filament.admin.reminders-due-bar')->render();
+            },
+        );
+
+        // PWA: manifest + installable app meta + service worker registration
+        // (scoped to this panel — render hooks are global across all panels)
+        FilamentView::registerRenderHook(
+            'panels::head.start',
+            fn (): string => Filament::getCurrentPanel()?->getId() === 'admin'
+                ? '<link rel="manifest" href="/pwa/admin-manifest.webmanifest">' . "\n" . '<meta name="theme-color" content="#0F172A">' . "\n" . '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n" . '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">' . "\n" . '<meta name="apple-mobile-web-app-title" content="Admin">' . "\n" . '<link rel="apple-touch-icon" href="/pwa/icons/apple-touch-icon.png">'
+                : '',
+        );
+        FilamentView::registerRenderHook(
+            'panels::scripts.after',
+            function (): string {
+                if (Filament::getCurrentPanel()?->getId() !== 'admin') {
+                    return '';
+                }
+                $config = json_encode([
+                    'swPath' => '/admin/sw.js',
+                    'subscribeUrl' => url('/push/subscribe'),
+                    'vapidPublicKey' => config('services.webpush.vapid.public_key'),
+                    'authenticated' => auth()->check(),
+                ]);
+                $installConfig = json_encode([
+                    'authenticated' => auth()->check(),
+                ]);
+                return '<script>
+if (\'serviceWorker\' in navigator) { navigator.serviceWorker.register(\'/admin/sw.js\'); }
+window.TTPushConfig = ' . $config . ';
+window.TTInstallConfig = ' . $installConfig . ';
+</script>
+<script src="/pwa/push-client.js"></script>
+<script src="/pwa/install-prompt.js"></script>';
             },
         );
     }

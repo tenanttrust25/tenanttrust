@@ -25,8 +25,8 @@
 **Soft Credit Check:** {{ $credit_check }}
 **Criminal Background Check:** {{ $background_check }}
 
-<x-mail::button :url="url('/admin/rental-applications')">
-View Application in Admin
+<x-mail::button :url="$actionUrl">
+{{ $actionLabel }}
 </x-mail::button>
 
 <x-mail::subcopy>

@@ -10,7 +10,7 @@ class MailCampaign extends Model
 {
     protected $fillable = [
         'template_id', 'title', 'description', 'status',
-        'scheduled_at', 'sent_at', 'audience_filter',
+        'scheduled_at', 'sent_at', 'audience_filter', 'audience_type',
         'recipient_count', 'sent_count', 'open_count', 'click_count',
     ];
 

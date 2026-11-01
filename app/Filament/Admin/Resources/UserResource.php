@@ -17,9 +17,10 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = "heroicon-o-users";
     protected static ?string $navigationLabel = "Users";
+    protected static ?string $navigationGroup = "People";
     protected static ?string $pluralModelLabel = "Users";
     protected static ?string $modelLabel = "User";
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
@@ -89,6 +90,21 @@ class UserResource extends Resource
                         'class' => 'rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4',
                     ])
                     ->visible(fn (string $operation): bool => $operation === 'edit'),
+
+                Forms\Components\Placeholder::make("account_credit")
+                    ->label("Account Credit (unapplied)")
+                    ->content(function (User $record) {
+                        $credit = (float) $record->payments()->sum('credit_remaining');
+
+                        return new \Illuminate\Support\HtmlString(
+                            "<span class=\"text-success-600 text-xl font-bold\">$" . number_format($credit, 2) . "</span>"
+                        );
+                    })
+                    ->helperText("Credit from over-payment not yet applied to an invoice. It will settle future invoices automatically.")
+                    ->extraAttributes([
+                        'class' => 'rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4',
+                    ])
+                    ->visible(fn (?User $record, string $operation): bool => $operation === 'edit' && $record && (float) $record->payments()->sum('credit_remaining') > 0),
 
                 Forms\Components\DatePicker::make("end_date")
                     ->label("End Date")

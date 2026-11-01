@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\PaymentAllocationService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,24 +13,9 @@ class Payment extends Model
 
     protected static function booted(): void
     {
-        static::created(function (Payment $payment) {
-            if ($payment->status === 'completed' && $payment->invoice_id) {
-                $invoice = $payment->invoice()->first();
-                if (! $invoice) {
-                    return;
-                }
-
-                // Only mark the invoice as paid once the full amount has been covered.
-                // Partial payments (e.g. on an overdue balance) keep the current status.
-                $totalPaid = (float) $invoice->payments()
-                    ->where('status', 'completed')
-                    ->sum('amount');
-
-                if ($totalPaid >= (float) $invoice->amount) {
-                    $invoice->update(['status' => 'paid']);
-                }
-            }
-        });
+        static::created(fn (Payment $payment) => app(PaymentAllocationService::class)->handle($payment));
+        static::updated(fn (Payment $payment) => app(PaymentAllocationService::class)->handle($payment));
+        static::deleted(fn (Payment $payment) => app(PaymentAllocationService::class)->handleDeleted($payment));
     }
 
     protected $fillable = [
@@ -39,11 +25,13 @@ class Payment extends Model
         'payment_method',
         'transaction_id',
         'status',
+        'credit_remaining',
         'paid_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'credit_remaining' => 'decimal:2',
         'paid_at' => 'datetime',
     ];
 

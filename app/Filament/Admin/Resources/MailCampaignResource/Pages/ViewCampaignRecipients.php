@@ -45,13 +45,25 @@ class ViewCampaignRecipients extends Page implements HasTable
                 TextColumn::make('opened_at')
                     ->label('Opened')
                     ->dateTime()
+                    ->sortable()
                     ->toggleable(),
                 TextColumn::make('click_count')
                     ->label('Clicks')
                     ->sortable()
                     ->toggleable(),
             ])
-            ->filters([])
+            ->filters([
+                \Filament\Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'sent' => 'Sent',
+                        'opened' => 'Opened',
+                        'clicked' => 'Clicked',
+                        'bounced' => 'Bounced',
+                        'unsubscribed' => 'Unsubscribed',
+                    ]),
+            ])
             ->defaultSort('status');
     }
 

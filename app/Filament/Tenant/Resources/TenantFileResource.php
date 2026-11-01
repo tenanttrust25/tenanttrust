@@ -19,7 +19,8 @@ class TenantFileResource extends Resource
     protected static ?string $navigationLabel = "Your Files";
     protected static ?string $pluralModelLabel = "Files";
     protected static ?string $modelLabel = "File";
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'Documents';
+    protected static ?int $navigationSort = 1;
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
@@ -47,6 +48,7 @@ class TenantFileResource extends Resource
                         "blue" => "lease",
                         "orange" => "N1",
                         "red" => "N4",
+                        "purple" => "N9",
                         "gray" => "other",
                     ])
                     ->formatStateUsing(fn(string $state): string => strtoupper($state)),

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="google-site-verification" content="xZacNQVDA0Qi5E9kyMRRtwI6yy02mFGqGMyPwCba4xc">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="@yield('meta_description', 'Tenant Trust is a professional property management company serving Greater Sudbury, Ontario. Quality rental properties, landlord services, and tenant placement you can trust.')">
     <title>@yield('title', 'Tenant Trust | Property Management in Sudbury, Ontario')</title>

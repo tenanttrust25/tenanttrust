@@ -22,9 +22,10 @@ class TenantFileResource extends Resource
 
     protected static ?string $navigationIcon = "heroicon-o-document-text";
     protected static ?string $navigationLabel = "Tenant Files";
+    protected static ?string $navigationGroup = "People";
     protected static ?string $pluralModelLabel = "Tenant Files";
     protected static ?string $modelLabel = "Tenant File";
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -70,6 +71,7 @@ class TenantFileResource extends Resource
                         "lease" => "Lease",
                         "N1" => "N1",
                         "N4" => "N4",
+                        "N9" => "N9",
                         "other" => "Other",
                     ])
                     ->default("other")
@@ -100,6 +102,7 @@ class TenantFileResource extends Resource
                         "blue" => "lease",
                         "orange" => "N1",
                         "red" => "N4",
+                        "purple" => "N9",
                         "gray" => "other",
                     ])
                     ->formatStateUsing(fn(string $state): string => strtoupper($state)),
@@ -114,6 +117,7 @@ class TenantFileResource extends Resource
                         "lease" => "Lease",
                         "N1" => "N1",
                         "N4" => "N4",
+                        "N9" => "N9",
                         "other" => "Other",
                     ]),
             ])

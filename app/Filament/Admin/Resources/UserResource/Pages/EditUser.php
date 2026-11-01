@@ -39,11 +39,17 @@ class EditUser extends EditRecord
                     $newPassword = Str::random(12);
                     $user->update(["password" => Hash::make($newPassword)]);
 
-                    $role = $user->role === "manager" ? "Property Manager" : ($user->role === "owner" ? "Client" : ucfirst($user->role));
+                    $role = match ($user->role) {
+                        "manager" => "Property Manager",
+                        "owner" => "Client",
+                        "tenant" => "Tenant",
+                        "previous_tenant" => "Previous Tenant",
+                        default => ucfirst($user->role),
+                    };
                     $loginUrl = match ($user->role) {
                         "manager" => url("/manager/login"),
                         "owner" => url("/owner/login"),
-                        "tenant" => url("/tenant/login"),
+                        "tenant", "previous_tenant" => url("/tenant/login"),
                         default => url("/admin/login"),
                     };
 

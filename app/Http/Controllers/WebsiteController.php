@@ -51,6 +51,17 @@ class WebsiteController extends Controller
         return view('properties.show', compact('property', 'activeUnit', 'similarProperties'));
     }
 
+    public function propertyInquire($slug)
+    {
+        $unit = \App\Models\PropertyUnit::with('property')->where('slug', $slug)->first();
+        $property = $unit ? $unit->property : Property::where('slug', $slug)->active()->with('units')->firstOrFail();
+        $activeUnit = $unit ?? $property->units->firstWhere('status', 'active');
+
+        $captcha = $this->generateCaptcha();
+
+        return view('properties.inquire', compact('property', 'activeUnit', 'captcha'));
+    }
+
     public function about()
     {
         return view('about');
@@ -105,6 +116,8 @@ class WebsiteController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'nullable|max:20',
             'message' => 'required',
+            'property_id' => 'nullable|integer|exists:properties,id',
+            'property_unit_id' => 'nullable|integer|exists:property_units,id',
             'captcha' => ['required', function ($attribute, $value, $fail) {
                 $expected = session('contact_captcha_answer');
                 session()->forget('contact_captcha_answer'); // single-use
@@ -114,6 +127,11 @@ class WebsiteController extends Controller
             }],
         ]);
         unset($validated['captcha']);
+
+        // If a unit was supplied but the parent property wasn't, resolve it.
+        if (!empty($validated['property_unit_id']) && empty($validated['property_id'])) {
+            $validated['property_id'] = \App\Models\PropertyUnit::whereKey($validated['property_unit_id'])->value('property_id');
+        }
 
         $submission = ContactSubmission::create($validated);
 

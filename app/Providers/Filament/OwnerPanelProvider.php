@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -33,6 +34,14 @@ class OwnerPanelProvider extends PanelProvider
             ])
             ->font("Work Sans")
             ->darkMode(true)
+            ->collapsibleNavigationGroups(true)
+            ->navigationGroups([
+                NavigationGroup::make('Properties'),
+                NavigationGroup::make('Leasing'),
+                NavigationGroup::make('Finance'),
+                NavigationGroup::make('Documents'),
+                NavigationGroup::make('Account'),
+            ])
             ->favicon(asset("favicon.ico"))
             ->discoverResources(in: app_path("Filament/Owner/Resources"), for: "App\\Filament\\Owner\\Resources")
             ->discoverPages(in: app_path("Filament/Owner/Pages"), for: "App\\Filament\\Owner\\Pages")

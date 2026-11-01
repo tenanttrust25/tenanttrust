@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Models\Property;
 use App\Models\PropertyUnit;
+use App\Services\InvoiceCombineService;
 use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -26,9 +27,10 @@ class InvoiceResource extends Resource
 
     protected static ?string $navigationIcon = "heroicon-o-currency-dollar";
     protected static ?string $navigationLabel = "Invoices";
+    protected static ?string $navigationGroup = "Rent & Billing";
     protected static ?string $pluralModelLabel = "Invoices";
     protected static ?string $modelLabel = "Invoice";
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -42,6 +44,7 @@ class InvoiceResource extends Resource
                     )
                     ->searchable()
                     ->preload()
+                    ->optionsLimit(500)
                     ->required()
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set) {
@@ -61,6 +64,7 @@ class InvoiceResource extends Resource
                     ->relationship("tenant", "name")
                     ->searchable()
                     ->preload()
+                    ->optionsLimit(500)
                     ->required(),
                 Select::make("property_id")
                     ->label("Property")
@@ -74,6 +78,15 @@ class InvoiceResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
+                Select::make("type")
+                    ->label("Type")
+                    ->options([
+                        "rent" => "Rent",
+                        "parking" => "Parking",
+                        "other" => "Other",
+                    ])
+                    ->default("rent")
+                    ->required(),
                 TextInput::make("amount")
                     ->label("Amount")
                     ->numeric()
@@ -112,6 +125,15 @@ class InvoiceResource extends Resource
                     ->label("Invoice #")
                     ->searchable()
                     ->sortable(),
+                TextColumn::make("type")
+                    ->label("Type")
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => ucfirst($state ?? 'rent'))
+                    ->color(fn ($state) => match ($state) {
+                        'rent' => 'success',
+                        'parking' => 'info',
+                        default => 'gray',
+                    }),
                 TextColumn::make("tenant.name")
                     ->label("Tenant")
                     ->searchable()
@@ -148,7 +170,12 @@ class InvoiceResource extends Resource
                         "cancelled" => "Cancelled",
                     ]),
             ])
-            ->defaultSort("created_at", "desc");
+            ->bulkActions([
+                InvoiceCombineService::bulkAction(),
+            ])
+            ->defaultSort("created_at", "desc")
+            ->defaultPaginationPageOption(10)
+            ->paginationPageOptions([10, 25, 50]);
     }
 
     public static function getRelations(): array

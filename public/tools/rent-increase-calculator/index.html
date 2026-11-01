@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ontario Rent Increase Calculator (2026 &amp; 2027) — N1 / N2 | Tenant Trust</title>
+<meta name="description" content="Free Ontario rent increase calculator. Enter your rent and dates to get the maximum lawful increase, your new rent, the earliest legal effective date, and the N1 serve-by deadline. Covers the 2026 (2.1%) and 2027 (1.9%) guidelines and rent-control exemptions.">
+<link rel="canonical" href="https://tenanttrust.ca/tools/rent-increase-calculator/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tenant Trust">
+<meta property="og:title" content="Ontario Rent Increase Calculator (2026 &amp; 2027) — N1 / N2 | Tenant Trust">
+<meta property="og:description" content="Free Ontario rent increase calculator. Enter your rent and dates to get the maximum lawful increase, your new rent, the earliest legal effective date, and the N1 serve-by deadline. Covers the 2026 (2.1%) and 2027 (1.9%) guidelines and rent-control exemptions.">
+<meta property="og:url" content="https://tenanttrust.ca/tools/rent-increase-calculator/">
+<meta property="og:image" content="https://tenanttrust.ca/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ontario Rent Increase Calculator (2026 &amp; 2027) — N1 / N2 | Tenant Trust">
+<meta name="twitter:description" content="Free Ontario rent increase calculator. Enter your rent and dates to get the maximum lawful increase, your new rent, the earliest legal effective date, and the N1 serve-by deadline. Covers the 2026 (2.1%) and 2027 (1.9%) guidelines and rent-control exemptions.">
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--card:#fff;--accent:#0f766e;--accent2:#115e59;--warn:#b45309;--ok:#15803d;--exemptbg:#ecfeff;}
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;gap:12px}
+  header img{height:34px}
+  header .brand{font-weight:700;letter-spacing:-.2px}
+  header .brand span{color:var(--accent)}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:1.55rem;line-height:1.2;margin:.2rem 0 .35rem;letter-spacing:-.4px}
+  .lede{color:var(--muted);margin:0 0 18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,.04);margin-bottom:16px}
+  label{display:block;font-weight:600;font-size:.86rem;margin:12px 0 5px}
+  label:first-child{margin-top:0}
+  .hint{font-weight:400;color:var(--muted);font-size:.8rem}
+  input[type=number],input[type=date],select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:1rem;background:#fff;color:var(--ink)}
+  input:focus,select:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.row{grid-template-columns:1fr}}
+  .radio{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-top:6px;cursor:pointer}
+  .radio input{margin-top:3px}
+  .radio.sel{border-color:var(--accent);background:#f0fdfa}
+  .radio b{font-size:.92rem}
+  .radio small{display:block;color:var(--muted);font-weight:400}
+  button.cta{width:100%;margin-top:16px;padding:13px;border:0;border-radius:11px;background:var(--accent);color:#fff;font-size:1.02rem;font-weight:700;cursor:pointer}
+  button.cta:hover{background:var(--accent2)}
+  #result{display:none}
+  .verdict{font-size:1.05rem;font-weight:700;padding:12px 14px;border-radius:11px;margin-bottom:14px}
+  .v-covered{background:#ecfdf5;color:var(--ok);border:1px solid #a7f3d0}
+  .v-exempt{background:var(--exemptbg);color:#0e7490;border:1px solid #a5f3fc}
+  .v-warn{background:#fffbeb;color:var(--warn);border:1px solid #fde68a}
+  .big{font-size:2rem;font-weight:800;letter-spacing:-1px;color:var(--accent)}
+  .big small{font-size:1rem;color:var(--muted);font-weight:600;letter-spacing:0}
+  table{width:100%;border-collapse:collapse;margin-top:6px}
+  td,th{padding:9px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:.95rem}
+  td:last-child,th:last-child{text-align:right}
+  .fine{font-size:.8rem;color:var(--muted)}
+  .disclaimer{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px;font-size:.82rem;color:#7c2d12}
+  .promo{background:linear-gradient(135deg,#0f766e,#0e7490);color:#fff;border-radius:14px;padding:18px}
+  .promo h3{margin:0 0 6px;font-size:1.1rem}
+  .promo p{margin:0 0 12px;opacity:.92;font-size:.92rem}
+  .promo a{display:inline-block;background:#fff;color:var(--accent2);text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px}
+  details{border-top:1px solid var(--line);padding:10px 0}
+  details summary{cursor:pointer;font-weight:600}
+  details p{color:var(--muted);font-size:.9rem}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <img src="/logo-tt.svg" alt="Tenant Trust" onerror="this.style.display='none'">
+  <div class="brand">Tenant <span>Trust</span></div>
+</header>
+
+<div class="wrap">
+  <h1>Ontario Rent Increase Calculator</h1>
+  <p class="lede">Enter a few details to see the <b>maximum lawful increase</b>, your <b>new rent</b>, and the <b>earliest legal date</b> — for the 2026 and 2027 guidelines.</p>
+
+  <div class="card">
+    <label for="rent">Current lawful monthly rent ($)</label>
+    <input type="number" id="rent" inputmode="decimal" placeholder="e.g. 1500" min="0" step="0.01">
+
+    <label>Basis for the 12-month rule</label>
+    <div class="radio sel" id="radLast">
+      <input type="radio" name="basis" id="basisLast" value="last" checked>
+      <div><b>My rent was already increased</b><small>The date of my last rent increase</small></div>
+    </div>
+    <div class="radio" id="radStart">
+      <input type="radio" name="basis" id="basisStart" value="start">
+      <div><b>Never increased</b><small>Use the date my tenancy began</small></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label class="hint" id="lblBasis" for="basisDate">Date of last increase</label>
+        <input type="date" id="basisDate">
+      </div>
+      <div>
+        <label class="hint" for="targetDate">Wanted effective date <span class="hint">(optional)</span></label>
+        <input type="date" id="targetDate">
+      </div>
+    </div>
+
+    <label style="margin-top:14px">Was anyone living in this unit for residential purposes <b>before Nov 15, 2018</b>?</label>
+    <div class="radio" id="radPre">
+      <input type="radio" name="occ" id="occPre" value="pre" checked>
+      <div><b>Yes — first occupied on or before Nov 15, 2018</b><small>Rent-controlled: the guideline applies (Form N1)</small></div>
+    </div>
+    <div class="radio" id="radPost">
+      <input type="radio" name="occ" id="occPost" value="post">
+      <div><b>No — first occupied after Nov 15, 2018</b><small>Rent-control <b>exempt</b>: any increase (Form N2)</small></div>
+    </div>
+    <div class="radio" id="radUnsure">
+      <input type="radio" name="occ" id="occUnsure" value="unsure">
+      <div><b>Not sure</b><small>We'll show the guideline result and flag it to verify</small></div>
+    </div>
+
+    <button class="cta" id="calcBtn">Calculate my maximum increase</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="card" id="faq">
+    <details><summary>What is the Ontario rent increase guideline for 2026 and 2027?</summary>
+      <p>The guideline is <b>2.1% for 2026</b> and <b>1.9% for 2027</b> (2.5% in 2025). It caps how much rent may be raised on a covered (rent-controlled) unit without LTB approval. The guideline for the year the increase takes effect applies.</p></details>
+    <details><summary>How much notice do I need to give for a rent increase?</summary>
+      <p>At least <b>90 days</b> written notice on a Form <b>N1</b>, at least <b>12 months</b> after the last increase (or since the tenancy began). Only one increase per 12 months.</p></details>
+    <details><summary>Did I miss the January 1, 2027 increase?</summary>
+      <p>To take effect Jan 1, 2027, notice had to be served by <b>Oct 3, 2026</b> — that date has passed. The calculator above shows your earliest lawful date from today.</p></details>
+    <details><summary>When is a unit exempt from rent control?</summary>
+      <p>Most units first occupied for residential purposes <b>after Nov 15, 2018</b> are exempt — rent can be increased by any amount on form <b>N2</b>, though the 90-day and 12-month rules still apply. The landlord carries the burden of proving the exemption.</p></details>
+  </div>
+
+  <p class="fine" style="margin-top:14px">Want the full picture? Read the <a href="/guides/ontario-rent-increase/" style="color:var(--accent2);font-weight:600">Ontario rent increase guide (2026 &amp; 2027)</a>.</p>
+
+  <div class="promo">
+    <h3>Rather not do this yourself?</h3>
+    <p>Tenant Trust manages Ontario rentals end-to-end — lawful increases, LTB forms, rent collection, and maintenance. We'll handle the notices and keep you compliant.</p>
+    <a href="https://tenanttrust.ca/book">📞 Book a free 15-min call →</a>
+    <div style="margin-top:9px;font-size:.88rem;opacity:.95">Prefer to talk now? Call <a href="tel:+12495233331" style="display:inline;background:none;color:#fff;text-decoration:underline;font-weight:600;padding:0">249-523-3331</a></div>
+  </div>
+
+  <div class="disclaimer" style="margin-top:16px">
+    <b>General information — not legal advice.</b> Tenant Trust is not a law firm and does not represent anyone at the Landlord and Tenant Board. Rules, forms, and figures change; confirm the current N1/N2 forms and guideline on the LTB and Ontario government sites before serving any notice. Above-guideline increases (AGIs) require a separate application to the LTB.
+  </div>
+
+  <footer>© <span id="yr"></span> Tenant Trust · tenanttrust.ca</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var GUIDELINE={2027:1.9,2026:2.1,2025:2.5,2024:2.5,2023:2.5,2022:1.2,2021:0.0,2020:2.2,2019:1.8,2018:1.8};
+  function parseDate(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+  function fmt(d){var m=['January','February','March','April','May','June','July','August','September','October','November','December'];return m[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();}
+  function addYear(d){var x=new Date(d.getFullYear()+1,d.getMonth(),d.getDate());if(x.getMonth()!==d.getMonth()){x=new Date(d.getFullYear()+1,d.getMonth()+1,0);}return x;}
+  function addDays(d,n){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x;}
+  function money(n){return '$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function $(id){return document.getElementById(id);}
+
+  $('yr').textContent=new Date().getFullYear();
+
+  function syncRadios(){
+    [['basisLast','radLast'],['basisStart','radStart'],['occPre','radPre'],['occPost','radPost'],['occUnsure','radUnsure']].forEach(function(b){
+      var inp=$(b[0]),box=$(b[1]);box.classList.toggle('sel',inp.checked);
+    });
+    $('lblBasis').textContent=$('basisStart').checked?'Date tenancy began':'Date of last increase';
+  }
+  document.querySelectorAll('input[type=radio]').forEach(function(r){r.addEventListener('change',syncRadios);});
+  syncRadios();
+
+  $('calcBtn').addEventListener('click',calc);
+  ['rent','basisDate','targetDate'].forEach(function(id){$(id).addEventListener('input',function(){if($('result').style.display==='block')calc();});});
+
+  function calc(){
+    var rent=parseFloat($('rent').value);
+    var res=$('result');
+    if(!(rent>0)){res.style.display='block';res.innerHTML='<div class="card"><div class="verdict v-warn">Enter your current monthly rent to continue.</div></div>';return;}
+    var basisInput=$('basisDate').value;
+    if(!basisInput){res.style.display='block';res.innerHTML='<div class="card"><div class="verdict v-warn">Please enter the '+(($('basisStart').checked)?'tenancy start':'last increase')+' date.</div></div>';return;}
+
+    var occ=$('occPost').checked?'post':($('occUnsure').checked?'unsure':'pre');
+    var base=parseDate(basisInput);
+    var today=new Date();today=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+
+    var twelve=addYear(base);
+    var ninety=addDays(today,90);
+    var earliest=new Date(Math.max(twelve.getTime(),ninety.getTime()));
+    var serveBy=addDays(earliest,-90);
+
+    var target=$('targetDate').value?parseDate($('targetDate').value):null;
+
+    var html='<div class="card">';
+    var exempt=(occ==='post');
+
+    if(exempt){
+      html+='<div class="verdict v-exempt">✓ This unit appears <b>exempt from rent control</b> (first occupied after Nov 15, 2018).</div>';
+      html+='<p class="fine" style="margin-top:-6px">You may increase rent by <b>any amount</b> on form <b>N2</b> — the guideline cap does not apply — but the 12-month and 90-day rules still do. The landlord bears the burden of proving the exemption.</p>';
+    } else if(occ==='unsure'){
+      html+='<div class="verdict v-warn">⚠ Verify the exemption before you rely on this result.</div>';
+      html+='<p class="fine" style="margin-top:-6px">Because you\'re not sure whether the unit was first occupied before Nov 15, 2018, we\'ve assumed it is <b>rent-controlled</b> (Form N1). Confirm the unit\'s first-occupancy date — it changes the answer.</p>';
+    } else {
+      html+='<div class="verdict v-covered">✓ This unit is <b>rent-controlled</b> — the guideline cap applies (Form N1).</div>';
+    }
+
+    if(target){
+      var tYear=target.getFullYear();
+      var ok12=target.getTime()>=twelve.getTime();
+      var ok90=target.getTime()>=addDays(today,90).getTime();
+      html+='<div style="font-weight:600;margin-top:6px">Your target date: '+fmt(target)+'</div>';
+      html+='<ul class="fine" style="margin:6px 0 2px;padding-left:18px">';
+      html+='<li>12-month rule: '+(ok12?'<b style="color:#15803d">OK</b>':'<b style="color:#b45309">Too soon</b> (must be on/after '+fmt(twelve)+')')+'</li>';
+      html+='<li>90-day notice: '+(ok90?'<b style="color:#15803d">OK</b>':'<b style="color:#b45309">Too soon</b> (earliest is '+fmt(addDays(today,90))+')')+'</li>';
+      html+='</ul>';
+    }
+
+    var effYear=earliest.getFullYear();
+    var g=GUIDELINE[effYear];
+
+    html+='<table>';
+    if(!exempt){
+      if(g===undefined){
+        html+='<tr><td>Maximum increase</td><td><b>Verify</b> (no guideline on file for '+effYear+')</td></tr>';
+      } else {
+        var inc=rent*g/100;
+        html+='<tr><td>Maximum lawful increase</td><td><b>'+g.toFixed(1)+'%</b> &nbsp;(+'+money(inc)+'/mo)</td></tr>';
+        html+='<tr><td>New maximum rent</td><td><span class="big">'+money(rent+inc)+'</span> <small>per month</small></td></tr>';
+      }
+    } else {
+      html+='<tr><td>Maximum increase</td><td><b>No cap</b> (exempt unit)</td></tr>';
+    }
+    html+='<tr><td>Earliest lawful effective date</td><td><b>'+fmt(earliest)+'</b></td></tr>';
+    html+='<tr><td>'+(exempt?'N2':'N1')+' must be served by</td><td><b>'+fmt(serveBy)+'</b></td></tr>';
+    html+='<tr><td>Increase basis</td><td>'+(($('basisStart').checked)?'Tenancy start ':'Last increase ')+fmt(base)+'</td></tr>';
+    html+='</table>';
+
+    html+='<p class="fine" style="margin-top:12px">Notice must be served <b>at least 90 days</b> before the effective date, on the current LTB form. Above-guideline increases (capital, security) require an LTB application. Rent may not be raised more than once every 12 months.</p>';
+    html+='</div>';
+    res.innerHTML=html;res.style.display='block';
+    res.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+})();
+</script>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is the Ontario rent increase guideline for 2026 and 2027?","acceptedAnswer":{"@type":"Answer","text":"The guideline is 2.1% for 2026 and 1.9% for 2027 (2.5% in 2025). It caps rent increases on rent-controlled units without LTB approval."}},
+{"@type":"Question","name":"How much notice is required for a rent increase in Ontario?","acceptedAnswer":{"@type":"Answer","text":"At least 90 days written notice on Form N1, at least 12 months after the last increase, once per 12 months."}},
+{"@type":"Question","name":"When is an Ontario rental unit exempt from rent control?","acceptedAnswer":{"@type":"Answer","text":"Units first occupied for residential purposes after November 15, 2018 are generally exempt; any increase is allowed on Form N2, but the 90-day and 12-month rules still apply."}}
+]}
+</script>
+<script src="/tools/lead.js" defer></script>
+</body>
+</html>

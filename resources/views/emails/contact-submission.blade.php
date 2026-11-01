@@ -4,6 +4,9 @@
 **From:** {{ $name }}
 **Email:** {{ $email }}
 **Phone:** {{ $phone }}
+@if(!empty($propertyContext))
+**Property:** {{ $propertyContext }}
+@endif
 
 **Message:**
 {{ $message }}

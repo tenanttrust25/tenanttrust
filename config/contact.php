@@ -16,4 +16,15 @@ return [
         'tenanttrust.ca',
         'tenantrust.ca',
     ],
+
+    /*
+    | Individual addresses that may never submit the public website forms.
+    |
+    | Use this when a spammer keeps using a legitimate domain (gmail, outlook,
+    | etc.) that you cannot ban wholesale. Matched case-insensitively against
+    | the full address on /contact and /apply.
+    */
+    'blocked_emails' => [
+        'jellybeanmhurtado559@gmail.com', // blocked 2026-10-22 (Steve)
+    ],
 ];

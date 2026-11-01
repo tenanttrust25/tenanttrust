@@ -21,7 +21,8 @@ class ManagementFees extends Page implements HasForms
     protected static ?string $navigationLabel = 'Management Fees';
     protected static ?string $title = 'Management Fees';
     protected static ?string $slug = 'management-fees';
-    protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $navigationGroup = 'Owner Finance';
+    protected static ?int $navigationSort = 1;
 
     public ?array $data = [];
 

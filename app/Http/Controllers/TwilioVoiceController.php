@@ -97,8 +97,13 @@ class TwilioVoiceController extends Controller
                 'talk to steve', 'speak to steve', 'speak with steve', 'connect', 'with steve',
                 'landlord', 'owner', 'manager', 'a human', 'a person', 'someone',
             ])) {
-            $log->update(['state' => 'done', 'intent' => 'steve']);
             Log::info('Twilio call: transferring to Steve', ['call_sid' => $log->call_sid, 'speech' => $speech]);
+            $log->update(['intent' => 'steve']);
+            $gate = $this->nameGateXml($log, (string) $log->from_number);
+            if ($gate !== null) {
+                return $this->twiml($gate);
+            }
+            $log->update(['state' => 'done']);
             return $this->twiml($this->transferToSteveResponse());
         }
 
@@ -211,6 +216,10 @@ class TwilioVoiceController extends Controller
         $reply = trim($reply);
 
         if ($marker === 'transfer') {
+            $gate = $this->nameGateXml($log, (string) $log->from_number);
+            if ($gate !== null) {
+                return $this->twiml($gate);
+            }
             $log->update(['state' => 'done']);
             return $this->twiml(
                 '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
@@ -289,6 +298,10 @@ class TwilioVoiceController extends Controller
         $log->appendTranscript('caller', $speech !== '' ? $speech : ($digits !== '' ? 'DTMF: ' . $digits : '(silence)'));
 
         if ($this->wantsSteve($input)) {
+            $gate = $this->nameGateXml($log, (string) $log->from_number);
+            if ($gate !== null) {
+                return $this->twiml($gate);
+            }
             $log->update(['state' => 'done']);
             return $this->twiml($this->transferToSteveResponse());
         }
@@ -396,6 +409,10 @@ class TwilioVoiceController extends Controller
         $log->appendTranscript('caller', $speech !== '' ? $speech : ($digits !== '' ? 'DTMF: ' . $digits : '(silence)'));
 
         if ($digits === '1' || $this->containsAny($input, ['steve', 'yes', 'right now', 'now', 'connect', '1'])) {
+            $gate = $this->nameGateXml($log, (string) $log->from_number);
+            if ($gate !== null) {
+                return $this->twiml($gate);
+            }
             $log->update(['state' => 'done', 'status' => 'transferred']);
             return $this->twiml($this->transferToSteveResponse());
         }
@@ -405,6 +422,243 @@ class TwilioVoiceController extends Controller
         $this->sendEscalationEmail($log);
 
         return $this->twiml($this->goodbyeResponse($log, true));
+    }
+
+    /* ================================================================
+     * WARM TRANSFER (whisper — heard by Steve only, then bridged)
+     * ================================================================ */
+
+    /**
+     * Twilio fetches this while Steve's phone is ringing. Whatever is said
+     * here is heard by Steve alone; the caller only hears ringback. When the
+     * TwiML completes the two legs are bridged (announce-only → auto-connect).
+     */
+    public function whisper(Request $request)
+    {
+        $callSid = (string) $request->input('CallSid', '');
+        $from = (string) $request->input('From', '');
+        $log = CallLog::where('call_sid', $callSid)->first();
+
+        $announcement = $this->callerAnnouncement($from, $log);
+
+        Log::info('Twilio whisper', [
+            'call_sid' => $callSid,
+            'from' => $from,
+            'announcement' => $announcement,
+        ]);
+
+        return $this->twiml(
+            '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
+            '<Response>' . $this->say($announcement) . '</Response>'
+        );
+    }
+
+    /**
+     * Who is calling, said to Steve. A registry match wins; otherwise the
+     * name the caller gave during the conversation; otherwise we say so.
+     * A raw phone number is never read out.
+     */
+    protected function callerAnnouncement(string $from, ?CallLog $log): string
+    {
+        $user = $this->matchUserByPhone($from);
+
+        if ($user) {
+            $label = match ($user->role) {
+                'owner' => 'property owner',
+                'admin' => 'Tenant Trust admin',
+                'previous_tenant' => 'former tenant',
+                default => 'tenant',
+            };
+            $text = 'Incoming call from ' . $user->name . ', ' . $label;
+            if (!empty($user->address)) {
+                $text .= ' at ' . $user->address;
+            }
+            return $text . '.';
+        }
+
+        $name = $this->statedName($log);
+        if ($name !== '') {
+            return 'Incoming call from ' . $name . '.';
+        }
+
+        return 'The caller did not provide a name.';
+    }
+
+    /**
+     * Find a user by caller-ID phone (compared on the last 10 digits).
+     */
+    protected function matchUserByPhone(string $from): ?User
+    {
+        $phone = $this->normalizePhone($from);
+        if ($phone === '') {
+            return null;
+        }
+        return User::whereNotNull('phone')
+            ->where('phone', '<>', '')
+            ->get()
+            ->first(fn ($u) => $this->normalizePhone($u->phone) === $phone);
+    }
+
+    /**
+     * The name the caller gave, pulled from the caller's own turns only.
+     * Looks for common phrasings. Returns '' when nothing usable is found.
+     */
+    protected function statedName(?CallLog $log): string
+    {
+        if (!$log) {
+            return '';
+        }
+
+        // Explicitly captured name (asked before transfer) wins.
+        $captured = ($log->data ?? [])['caller_name'] ?? '';
+        if (is_string($captured) && $captured !== '') {
+            return $captured;
+        }
+
+        $callerText = '';
+        foreach (($log->transcript ?? []) as $entry) {
+            if (strtolower((string) ($entry['speaker'] ?? '')) === 'caller') {
+                $callerText .= ' ' . (string) ($entry['text'] ?? '');
+            }
+        }
+
+        return $this->extractNameFromText(trim($callerText));
+    }
+
+    /**
+     * Pull a name out of free text using common self-identification phrasings
+     * ("my name is X", "this is X", "I'm X", "call me X"). Returns '' when
+     * nothing name-like is found — deliberately does NOT fall back to treating
+     * arbitrary speech as a name.
+     */
+    protected function extractNameFromText(string $text): string
+    {
+        if ($text === '') {
+            return '';
+        }
+
+        $patterns = [
+            '/\bmy name(?:\'s| is)\s+(.{2,60})/i',
+            '/\b(?:this is|it\'s|its|i am|i\'m)\s+(.{2,60})/i',
+            '/\bname(?:\'s| is)\s+(.{2,60})/i',
+            '/\b(?:you can )?call me\s+(.{2,60})/i',
+        ];
+
+        foreach ($patterns as $re) {
+            if (preg_match($re, $text, $m)) {
+                $name = $this->cleanName($m[1]);
+                if ($name !== '') {
+                    return $name;
+                }
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Turn a raw captured phrase into a plausible spoken name (max 2 words).
+     * Rejects phrases that begin with a non-name word so we never announce
+     * something like "Urgent" or "Rent".
+     */
+    protected function cleanName(string $raw): string
+    {
+        $stop = ['the', 'a', 'an', 'and', 'for', 'from', 'with', 'about', 'calling',
+            'in', 'on', 'of', 'to', 'at', 'my', 'me', 'is', 'are', 'was', 'it',
+            'this', 'that', 'here', 'there', 'hello', 'hi', 'yes', 'no', 'okay',
+            'ok', 'thanks', 'thank', 'you', 'your', 'sorry', 'well', 'just',
+            'looking', 'regarding', 'concerning', 'urgent', 'emergency', 'rent',
+            'payment', 'maintenance', 'problem', 'issue', 'with'];
+
+        $raw = strtolower(trim($raw));
+        $raw = preg_replace('/[^a-z\s\'-]/', ' ', $raw);
+        $tokens = array_values(array_filter(preg_split('/\s+/', trim($raw)) ?: [],
+            fn ($t) => $t !== '' && strlen($t) >= 2));
+
+        if (empty($tokens) || in_array($tokens[0], $stop, true)) {
+            return '';
+        }
+
+        $name = [$tokens[0]];
+        if (isset($tokens[1]) && !in_array($tokens[1], $stop, true)) {
+            $name[] = $tokens[1];
+        }
+
+        return ucwords(implode(' ', $name));
+    }
+
+    /**
+     * If the caller isn't identified (no registry match) and hasn't given a
+     * name yet, ask for it once before handing the call to Steve, so the
+     * whisper can announce a name. Returns TwiML XML when we should ask, or
+     * null when it's fine to proceed straight to the transfer.
+     */
+    protected function nameGateXml(?CallLog $log, string $from): ?string
+    {
+        if (!$log || $this->matchUserByPhone($from)) {
+            return null; // known caller — nothing to ask
+        }
+
+        $data = $log->data ?? [];
+        if (!empty($data['asked_name'])) {
+            return null; // only ever ask once per call
+        }
+        if ($this->statedName($log) !== '') {
+            return null; // they already gave it
+        }
+
+        $data['asked_name'] = true;
+        $log->update(['data' => $data]);
+
+        return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
+            '<Response>' .
+            $this->say('Before I connect you, may I have your name?') .
+            $this->gatherTag($this->appUrl('/twilio/askname'), 'speech', null, 'name, my name is, speaking') .
+            $this->say('Sorry, I did not catch that. Connecting you with Steve now.') .
+            $this->transferToSteveDial() .
+            '</Response>';
+    }
+
+    /**
+     * Second leg of the name gate: the caller answered the name question.
+     * Store the name, then complete the transfer to Steve.
+     */
+    public function askName(Request $request)
+    {
+        $callSid = (string) $request->input('CallSid', '');
+        $log = CallLog::where('call_sid', $callSid)->first();
+
+        if (!$log) {
+            return $this->twiml($this->fallbackResponse());
+        }
+
+        $speech = trim((string) $request->input('SpeechResult', ''));
+        $log->appendTranscript('caller', $speech !== '' ? $speech : '(no name given)');
+
+        $name = $this->extractNameFromText($speech);
+        if ($name === '') {
+            $name = $this->cleanName($speech);
+        }
+
+        if ($name !== '') {
+            $data = $log->data ?? [];
+            $data['caller_name'] = $name;
+            $log->update(['data' => $data]);
+            if (empty($log->tenant_name)) {
+                $log->update(['tenant_name' => $name]);
+            }
+        }
+
+        $log->update(['state' => 'done', 'status' => 'transferred']);
+        Log::info('Twilio call: name gate complete', ['call_sid' => $callSid, 'name' => $name]);
+
+        return $this->twiml(
+            '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
+            '<Response>' .
+            $this->say('Thank you. Connecting you with Steve now. One moment, please.') .
+            $this->transferToSteveDial() .
+            '</Response>'
+        );
     }
 
     /* ================================================================
@@ -546,9 +800,12 @@ class TwilioVoiceController extends Controller
 
     protected function transferToSteveDial(): string
     {
+        // Warm transfer: <Number url> plays a whisper to Steve only (the
+        // caller hears ringback) and then bridges the two legs.
         return '<Dial callerId="' . $this->businessNumber . '" timeout="25" ' .
             'action="' . $this->appUrl('/twilio/dial-result') . '" method="POST">' .
-            $this->steveNumber . '</Dial>';
+            '<Number url="' . $this->appUrl('/twilio/whisper') . '" method="POST">' .
+            $this->steveNumber . '</Number></Dial>';
     }
 
     protected function goodbyeResponse(CallLog $log, bool $escalated = false): string

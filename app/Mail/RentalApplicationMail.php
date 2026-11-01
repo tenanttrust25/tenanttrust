@@ -15,9 +15,16 @@ class RentalApplicationMail extends Mailable
 
     public RentalApplication $application;
 
-    public function __construct(RentalApplication $application)
+    /**
+     * Who this copy is for: "admin" (staff) or "owner" (client portal).
+     * Owners cannot open /admin — their link must point at /owner.
+     */
+    public string $audience;
+
+    public function __construct(RentalApplication $application, string $audience = 'admin')
     {
         $this->application = $application;
+        $this->audience = $audience === 'owner' ? 'owner' : 'admin';
     }
 
     public function envelope(): Envelope
@@ -49,6 +56,12 @@ class RentalApplicationMail extends Mailable
                 "smoker" => $this->application->is_smoker ? "Yes" : "No",
                 "credit_check" => $this->application->consent_credit_check ? "Consented" : "Not consented",
                 "background_check" => $this->application->consent_background_check ? "Consented" : "Not consented",
+                "actionUrl" => $this->audience === 'owner'
+                    ? url('/owner/rental-applications/' . $this->application->id)
+                    : url('/admin/rental-applications/' . $this->application->id),
+                "actionLabel" => $this->audience === 'owner'
+                    ? 'View Application in Client Portal'
+                    : 'View Application in Admin',
             ],
         );
     }

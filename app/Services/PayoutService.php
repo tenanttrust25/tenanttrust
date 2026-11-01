@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\Payout;
 use App\Models\Property;
+use App\Support\TenantTrustSettings;
 use Illuminate\Support\Facades\DB;
 
 class PayoutService
@@ -14,6 +15,19 @@ class PayoutService
         $property = $invoice->property;
         $propertyUnit = $invoice->propertyUnit;
         $rentAmount = $invoice->amount;
+
+        // Management fee applies to RENT invoices only. Parking/Other carry no fee.
+        if (($invoice->type ?? 'rent') !== 'rent') {
+            return [
+                "type" => "none",
+                "rate" => 0,
+                "amount" => 0.0,
+                "tax_rate" => null,
+                "tax" => 0.0,
+                "total" => 0.0,
+                "net" => round($rentAmount, 2),
+            ];
+        }
 
         $feeType = null;
         $feeRate = null;
@@ -26,6 +40,13 @@ class PayoutService
 
                 if ($feeType === "percentage") {
                     $feeAmount = round($rentAmount * ($feeRate / 100), 2);
+                } elseif ($feeType === "flat_monthly") {
+                    // Per-property flat charged once per calendar month, on the
+                    // first rent payment received for that property in the month.
+                    // Subsequent unit invoices in the same month carry no fee.
+                    $feeAmount = $this->isFirstFeeForPropertyThisMonth($property->id, $invoice)
+                        ? (float) $feeRate
+                        : 0.0;
                 } else {
                     $feeAmount = $feeRate;
                 }
@@ -44,12 +65,47 @@ class PayoutService
             $feeAmount = round($rentAmount * 0.08, 2);
         }
 
+        // GST/HST on the management fee (off unless enabled in Admin > Settings).
+        $hstEnabled = TenantTrustSettings::hstEnabled();
+        $hstRate = TenantTrustSettings::hstRate();
+        $taxAmount = ($hstEnabled && $feeAmount > 0)
+            ? round($feeAmount * ($hstRate / 100), 2)
+            : 0.0;
+
         return [
             "type" => $feeType,
             "rate" => $feeRate,
             "amount" => $feeAmount,
-            "net" => round($rentAmount - $feeAmount, 2),
+            "tax_rate" => $hstEnabled ? $hstRate : null,
+            "tax" => $taxAmount,
+            "total" => round($feeAmount + $taxAmount, 2),
+            "net" => round($rentAmount - $feeAmount - $taxAmount, 2),
         ];
+    }
+
+    /**
+     * True when no payout has yet been recorded for this property in the rent
+     * month of the given invoice. Backs the "flat_monthly" fee type so a
+     * per-property flat is charged exactly once per month.
+     */
+    protected function isFirstFeeForPropertyThisMonth(int $propertyId, Invoice $invoice): bool
+    {
+        $useDueDate = ! empty($invoice->due_date);
+        $ref = $useDueDate ? $invoice->due_date : $invoice->created_at;
+
+        if (! $ref) {
+            return true;
+        }
+
+        $ref = \Illuminate\Support\Carbon::parse($ref);
+        $column = $useDueDate ? 'due_date' : 'created_at';
+
+        return ! Payout::where('property_id', $propertyId)
+            ->whereHas('invoice', function ($query) use ($ref, $column) {
+                $query->whereYear($column, $ref->year)
+                    ->whereMonth($column, $ref->month);
+            })
+            ->exists();
     }
 
     public function processPaidInvoice(Invoice $invoice): ?Payout
@@ -68,6 +124,8 @@ class PayoutService
                 "invoice_id" => $invoice->id,
                 "rent_amount" => $invoice->amount,
                 "management_fee" => $fee["amount"],
+                "tax_amount" => $fee["tax"],
+                "tax_rate" => $fee["tax_rate"],
                 "net_amount" => $fee["net"],
                 "management_fee_type" => $fee["type"],
                 "management_fee_rate" => $fee["rate"],

@@ -15,7 +15,9 @@ class PayoutSettings extends Page
 
     protected static ?string $navigationLabel = 'Payout Settings';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'Finance';
+
+    protected static ?int $navigationSort = 2;
 
     protected static string $view = 'filament.owner.payout-settings';
 

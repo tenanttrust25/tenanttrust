@@ -19,8 +19,8 @@
         <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://tenanttrust.ca/properties/151-153-kathleen</loc>
-        <lastmod>2026-08-27</lastmod>
+        <loc>https://tenanttrust.ca/properties/151-kathleen</loc>
+        <lastmod>2026-10-25</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -101,5 +101,113 @@
         <lastmod>2026-08-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/tools/rent-increase-calculator/</loc>
+        <lastmod>2026-10-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/tools/n4-arrears-calculator/</loc>
+        <lastmod>2026-10-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/tools/rent-control-test/</loc>
+        <lastmod>2026-10-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/tools/deposit-interest-calculator/</loc>
+        <lastmod>2026-10-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/tools/standard-lease-builder/</loc>
+        <lastmod>2026-10-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/tools/</loc>
+        <lastmod>2026-10-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/book/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/tools/sudbury/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/tools/etobicoke/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/services/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/guides/ontario-rent-increase/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/guides/serving-notices-ontario/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/guides/rent-control-ontario/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/guides/deposit-interest-ontario/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/guides/</loc>
+        <lastmod>2026-10-16</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/properties/toffee-crt</loc>
+        <lastmod>2026-10-25</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/properties/twenty-first-st</loc>
+        <lastmod>2026-10-25</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://tenanttrust.ca/properties/superior</loc>
+        <lastmod>2026-10-25</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
     </url>
 </urlset>

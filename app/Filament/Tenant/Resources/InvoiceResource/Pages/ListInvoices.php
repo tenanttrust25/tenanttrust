@@ -13,4 +13,16 @@ class ListInvoices extends ListRecords
     {
         return [];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Tenant\Widgets\OutstandingBalanceWidget::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 1;
+    }
 }

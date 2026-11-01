@@ -22,20 +22,39 @@ class ContactSubmissionMail extends Mailable
 
     public function envelope(): Envelope
     {
+        $property = $this->submission->property;
+
+        $subject = $property
+            ? 'New Property Inquiry — ' . $property->title . ' (' . $this->submission->name . ')'
+            : 'New Contact Form Submission from ' . $this->submission->name;
+
         return new Envelope(
-            subject: 'New Contact Form Submission from ' . $this->submission->name,
+            subject: $subject,
         );
     }
 
     public function content(): Content
     {
+        $submission = $this->submission;
+        $property = $submission->property;
+        $unit = $submission->propertyUnit;
+
+        $propertyContext = null;
+        if ($property) {
+            $propertyContext = $property->title . ' — ' . $property->address . ', ' . $property->city;
+            if ($unit?->unit) {
+                $propertyContext .= ' (Unit ' . $unit->unit . ')';
+            }
+        }
+
         return new Content(
             markdown: 'emails.contact-submission',
             with: [
-                "name" => $this->submission->name,
-                "email" => $this->submission->email,
-                "phone" => $this->submission->phone ?? "N/A",
-                "message" => $this->submission->message,
+                "name" => $submission->name,
+                "email" => $submission->email,
+                "phone" => $submission->phone ?? "N/A",
+                "message" => $submission->message,
+                "propertyContext" => $propertyContext,
             ],
         );
     }

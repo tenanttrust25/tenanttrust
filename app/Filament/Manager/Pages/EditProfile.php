@@ -13,6 +13,7 @@ class EditProfile extends Page
 {
     protected static ?string $navigationIcon = "heroicon-o-user-circle";
     protected static ?string $navigationLabel = "My Profile";
+    protected static ?string $navigationGroup = "Account";
     protected static ?string $title = "My Profile";
     protected static ?string $slug = "profile";
     protected static ?int $navigationSort = 1;

@@ -13,6 +13,8 @@ class Payout extends Model
         'invoice_id',
         'rent_amount',
         'management_fee',
+        'tax_amount',
+        'tax_rate',
         'net_amount',
         'management_fee_type',
         'management_fee_rate',
@@ -24,6 +26,8 @@ class Payout extends Model
     protected $casts = [
         'rent_amount' => 'decimal:2',
         'management_fee' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
         'net_amount' => 'decimal:2',
         'management_fee_rate' => 'decimal:2',
         'paid_at' => 'datetime',

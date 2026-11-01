@@ -5,6 +5,10 @@ namespace App\Filament\Tenant\Resources;
 use App\Filament\Components\ImageUpload;
 use App\Models\MaintenanceTicket;
 use App\Models\Tenancy;
+use App\Models\TicketReply;
+use App\Models\User;
+use App\Notifications\StaffTicketReplyNotification;
+use App\Services\PushNotificationService;
 use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -18,7 +22,10 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MaintenanceTicketResource extends Resource
 {
@@ -28,7 +35,8 @@ class MaintenanceTicketResource extends Resource
     protected static ?string $navigationLabel = "Maintenance";
     protected static ?string $pluralModelLabel = "Maintenance Requests";
     protected static ?string $modelLabel = "Maintenance Request";
-    protected static ?int $navigationSort = 5;
+    protected static ?string $navigationGroup = 'Requests';
+    protected static ?int $navigationSort = 1;
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
@@ -152,14 +160,67 @@ class MaintenanceTicketResource extends Resource
                     ]),
             ])
             ->actions([
+                Action::make("reply")
+                    ->label("Reply")
+                    ->icon("heroicon-o-chat-bubble-left-right")
+                    ->color("primary")
+                    ->modalHeading(fn(MaintenanceTicket $record): string => "Reply to " . $record->ticket_number)
+                    ->modalSubmitActionLabel("Send Reply")
+                    ->form([
+                        Textarea::make("message")
+                            ->label("Your message")
+                            ->required()
+                            ->rows(4)
+                            ->maxLength(2000)
+                            ->placeholder("Add more detail or answer a question from the property manager..."),
+                    ])
+                    ->action(function (MaintenanceTicket $record, array $data): void {
+                        // Defense in depth: the table query already scopes to the
+                        // tenant's own tickets, but never trust the record alone.
+                        abort_unless(
+                            in_array($record->tenant_id, auth()->user()->getUnitTenantIds(), true),
+                            403
+                        );
+
+                        $reply = TicketReply::create([
+                            "maintenance_ticket_id" => $record->id,
+                            "user_id" => auth()->id(),
+                            "message" => $data["message"],
+                        ]);
+
+                        // Notify staff (admins + managers) by email and push.
+                        try {
+                            $staff = User::whereIn("role", ["admin", "manager"])->get();
+
+                            foreach ($staff as $member) {
+                                try {
+                                    $member->notify(new StaffTicketReplyNotification($record, $reply));
+                                } catch (\Exception $e) {
+                                    Log::warning("Ticket reply staff email failed: " . $e->getMessage());
+                                }
+                            }
+
+                            if ($staff->isNotEmpty()) {
+                                app(PushNotificationService::class)->sendToUsers(
+                                    $staff,
+                                    "Tenant reply on ticket #" . $record->ticket_number,
+                                    ($reply->user?->name ?? "Tenant") . ": " . Str::limit($data["message"], 90),
+                                    url("/admin/maintenance-tickets/" . $record->id . "/edit")
+                                );
+                            }
+                        } catch (\Exception $e) {
+                            Log::warning("Ticket reply staff notification failed: " . $e->getMessage());
+                        }
+
+                        Notification::make()
+                            ->title("Reply sent")
+                            ->success()
+                            ->send();
+                    }),
+
                 ViewAction::make()
                     ->label("View Details")
-                    ->modalHeading(fn(MaintenanceTicket $record): string => "Ticket: " . $record->ticket_number)
-                    ->modalContent(function (MaintenanceTicket $record): \Illuminate\View\View {
-                        return view("filament.tenant.ticket-detail", [
-                            "ticket" => $record,
-                        ]);
-                    }),
+                    ->url(fn(MaintenanceTicket $record): string => MaintenanceTicketResource::getUrl("view", ["record" => $record])),
             ])
             ->bulkActions([])
             ->defaultSort("created_at", "desc");
@@ -175,6 +236,7 @@ class MaintenanceTicketResource extends Resource
         return [
             "index" => \App\Filament\Tenant\Resources\MaintenanceTicketResource\Pages\ListMaintenanceTickets::route("/"),
             "create" => \App\Filament\Tenant\Resources\MaintenanceTicketResource\Pages\CreateMaintenanceTicket::route("/create"),
+            "view" => \App\Filament\Tenant\Resources\MaintenanceTicketResource\Pages\ViewMaintenanceTicket::route("/{record}"),
         ];
     }
 }

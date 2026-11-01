@@ -21,7 +21,8 @@ class MaintenanceTicketResource extends Resource
     protected static ?string $navigationLabel = "Maintenance Tracker";
     protected static ?string $pluralLabel = "Maintenance Tracker";
     protected static ?string $slug = "maintenance";
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'Properties';
+    protected static ?int $navigationSort = 2;
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
@@ -62,6 +63,14 @@ class MaintenanceTicketResource extends Resource
                         "closed" => "gray",
                         default => "gray",
                     }),
+                TextColumn::make("vendor")
+                    ->label("Vendor")
+                    ->placeholder("—")
+                    ->toggleable(),
+                TextColumn::make("cost")
+                    ->label("Repair Cost")
+                    ->money("CAD")
+                    ->placeholder("—"),
                 TextColumn::make("created_at")
                     ->label("Reported")
                     ->date()

@@ -24,11 +24,20 @@ class CreateUser extends CreateRecord
     protected function afterCreate(): void
     {
         $user = $this->record;
-        $loginUrl = $user->role === "manager"
-            ? url("/manager/login")
-            : url("/owner/login");
+        $loginUrl = match ($user->role) {
+            "manager" => url("/manager/login"),
+            "owner" => url("/owner/login"),
+            "tenant", "previous_tenant" => url("/tenant/login"),
+            default => url("/admin/login"),
+        };
 
-        $role = $user->role === "manager" ? "Property Manager" : "Client";
+        $role = match ($user->role) {
+            "manager" => "Property Manager",
+            "owner" => "Client",
+            "tenant" => "Tenant",
+            "previous_tenant" => "Previous Tenant",
+            default => "User",
+        };
 
         // Try to send email
         $emailSent = false;

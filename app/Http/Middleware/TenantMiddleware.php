@@ -10,7 +10,7 @@ class TenantMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || auth()->user()->role !== "tenant") {
+        if (!auth()->check() || !in_array(auth()->user()->role, ["tenant", "previous_tenant"], true)) {
             abort(403, "Access denied. Tenant access only.");
         }
 

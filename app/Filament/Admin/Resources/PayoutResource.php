@@ -21,9 +21,10 @@ class PayoutResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $navigationGroup = 'Owner Finance';
 
     protected static ?string $navigationLabel = 'Owner Payouts';
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $pluralModelLabel = 'Owner Payouts';
 
@@ -51,6 +52,11 @@ class PayoutResource extends Resource
                     ->money('CAD')
                     ->sortable()
                     ->label('Mgmt Fee'),
+                Tables\Columns\TextColumn::make('tax_amount')
+                    ->money('CAD')
+                    ->sortable()
+                    ->label('HST')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('net_amount')
                     ->money('CAD')
                     ->sortable()
@@ -152,6 +158,8 @@ class PayoutResource extends Resource
                         Infolists\Components\TextEntry::make('invoice.invoice_number')->label('Invoice'),
                         Infolists\Components\TextEntry::make('rent_amount')->money('CAD')->label('Rent Collected'),
                         Infolists\Components\TextEntry::make('management_fee')->money('CAD')->label('Management Fee'),
+                        Infolists\Components\TextEntry::make('tax_amount')->money('CAD')->label('HST')
+                            ->visible(fn (Payout $record): bool => (float) $record->tax_amount > 0),
                         Infolists\Components\TextEntry::make('net_amount')->money('CAD')->label('Net to Owner'),
                         Infolists\Components\TextEntry::make('status')->badge(),
                         Infolists\Components\TextEntry::make('owner.stripe_onboarding_complete')

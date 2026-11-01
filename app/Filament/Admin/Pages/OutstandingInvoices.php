@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Pages;
 
 use App\Filament\Admin\Resources\InvoiceResource;
 use App\Models\Invoice;
+use App\Services\InvoiceCombineService;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\BadgeColumn;
@@ -20,8 +21,8 @@ class OutstandingInvoices extends Page implements HasTable
     protected static ?string $navigationLabel = 'Outstanding';
     protected static ?string $title = 'Outstanding Invoices';
     protected static ?string $slug = 'outstanding-invoices';
-    protected static ?string $navigationGroup = 'Finance';
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'Rent & Billing';
+    protected static ?int $navigationSort = 3;
 
     public function table(Table $table): Table
     {
@@ -71,6 +72,9 @@ class OutstandingInvoices extends Page implements HasTable
                     ->label('View / Edit')
                     ->icon('heroicon-o-pencil-square')
                     ->url(fn (Invoice $record) => InvoiceResource::getUrl('edit', ['record' => $record])),
+            ])
+            ->bulkActions([
+                InvoiceCombineService::bulkAction(),
             ])
             ->defaultSort('due_date', 'asc');
     }

@@ -17,7 +17,12 @@ class PageResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'Content';
+    protected static ?string $navigationGroup = 'Website';
+    protected static ?int $navigationSort = 1;
+
+    // Hidden from the admin nav: scaffolded CMS-pages feature the site doesn't use
+    // (site pages are hard-coded Blade views). Re-enable by flipping to true.
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Form $form): Form
     {

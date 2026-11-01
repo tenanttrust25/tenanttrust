@@ -53,7 +53,11 @@
                                         @php $files = $this->getFilesForTenant($tenant->id); @endphp
 
                                         <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-4">
-                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            @php
+                                                $outstanding = $this->getOutstandingBalance($tenant->id);
+                                                $balanceClass = $outstanding > 0 ? 'text-danger-600 dark:text-danger-400' : 'text-success-600 dark:text-success-400';
+                                            @endphp
+                                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                                 <div>
                                                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Name</p>
                                                     <p class="font-medium text-gray-900 dark:text-white">{{ $tenant->name }}</p>
@@ -65,6 +69,10 @@
                                                 <div>
                                                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Phone</p>
                                                     <p class="font-medium text-gray-900 dark:text-white">{{ $tenant->phone ?? "N/A" }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Current Outstanding Balance</p>
+                                                    <p class="font-medium {{ $balanceClass }}">${{ number_format($outstanding, 2) }}</p>
                                                 </div>
                                             </div>
 

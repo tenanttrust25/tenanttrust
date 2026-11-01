@@ -10,6 +10,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -37,12 +38,20 @@ class TenantPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
             ->darkMode(true)
+            ->collapsibleNavigationGroups(true)
+            ->navigationGroups([
+                NavigationGroup::make('Rent & Billing'),
+                NavigationGroup::make('Requests'),
+                NavigationGroup::make('Documents'),
+                NavigationGroup::make('Account'),
+            ])
             ->discoverResources(in: app_path('Filament/Tenant/Resources'), for: 'App\\Filament\\Tenant\\Resources')
             ->discoverPages(in: app_path('Filament/Tenant/Pages'), for: 'App\\Filament\\Tenant\\Pages')
             ->pages([
                 Dashboard::class,
                 EditProfile::class,
-                \App\Filament\Tenant\Pages\YearEnd::class
+                \App\Filament\Tenant\Pages\YearEnd::class,
+                \App\Filament\Tenant\Pages\SubmitN9::class
             ])
             ->discoverWidgets(in: app_path('Filament/Tenant/Widgets'), for: 'App\\Filament\\Tenant\\Widgets')
             ->widgets([
@@ -79,7 +88,7 @@ class TenantPanelProvider extends PanelProvider
         FilamentView::registerRenderHook(
             'panels::head.start',
             fn (): string => \Filament\Facades\Filament::getCurrentPanel()?->getId() === 'tenant'
-                ? '<link rel="manifest" href="/pwa/tenant-manifest.webmanifest">\n<meta name="theme-color" content="#0F172A">\n<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n<meta name="apple-mobile-web-app-title" content="Tenant Portal">\n<link rel="apple-touch-icon" href="/pwa/icons/apple-touch-icon.png">'
+                ? '<link rel="manifest" href="/pwa/tenant-manifest.webmanifest">' . "\n" . '<meta name="theme-color" content="#0F172A">' . "\n" . '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n" . '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">' . "\n" . '<meta name="apple-mobile-web-app-title" content="Tenant Portal">' . "\n" . '<link rel="apple-touch-icon" href="/pwa/icons/apple-touch-icon.png">'
                 : '',
         );
         FilamentView::registerRenderHook(

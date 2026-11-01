@@ -17,6 +17,14 @@
                 </div>
             </a>
 
+            <a href="/manager/login" class="portal-card" style="text-decoration: none; display: block;">
+                <div class="portal-card-inner" style="background: #fff; border-radius: 16px; padding: 36px 28px; box-shadow: 0 4px 24px rgba(0,0,0,.08); text-align: center; transition: all .3s;">
+                    <div class="portal-icon portal-icon-blue" style="width: 64px; height: 64px; background: #2563EB; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 1.8rem;">&#128203;</div>
+                    <h3 class="portal-title" style="color: #0F172A; margin: 0 0 6px; font-family: Manrope, sans-serif; text-transform: uppercase; font-size: 1.1rem;">Manager</h3>
+                    <p class="portal-desc" style="color: #666; margin: 0; font-size: .85rem;">Manage maintenance, leasing and day-to-day operations</p>
+                </div>
+            </a>
+
             <a href="/owner/login" class="portal-card" style="text-decoration: none; display: block;">
                 <div class="portal-card-inner" style="background: #fff; border-radius: 16px; padding: 36px 28px; box-shadow: 0 4px 24px rgba(0,0,0,.08); text-align: center; transition: all .3s;">
                     <div class="portal-icon portal-icon-gold" style="width: 64px; height: 64px; background: #DCA54A; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 1.8rem;">&#128100;</div>

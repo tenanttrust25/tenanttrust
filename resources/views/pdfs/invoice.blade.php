@@ -137,7 +137,7 @@
     </table>
 
     <div class="footer">
-        <p>Tenant Trust &bull; 123 Business Ave &bull; Toronto, ON &bull; hello@tenanttrust.ca</p>
+        <p>Tenant Trust &bull; 474 McKim St Unit 3, Sudbury, ON P3C 2L6 &bull; info@tenanttrust.ca</p>
         <p>Thank you for your business!</p>
     </div>
 </body>

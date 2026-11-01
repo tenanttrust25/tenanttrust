@@ -27,6 +27,34 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Send the password reset notification with an explicit tenant-panel URL.
+     *
+     * Filament resolves the reset URL from the *current panel*, which does not
+     * exist inside a queue worker. Building the signed URL before the job is
+     * queued keeps resets working under any queue driver (and stops the
+     * "Route [password.reset] not defined" failure).
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $notification = new \Filament\Notifications\Auth\ResetPassword($token);
+
+        try {
+            $notification->url = \Filament\Facades\Filament::getPanel('tenant')
+                ->getResetPasswordUrl($token, $this);
+        } catch (\Throwable $e) {
+            $notification->url = \Illuminate\Support\Facades\URL::signedRoute(
+                'filament.tenant.auth.password-reset.reset',
+                [
+                    'email' => $this->getEmailForPasswordReset(),
+                    'token' => $token,
+                ]
+            );
+        }
+
+        $this->notify($notification);
+    }
+
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class, 'tenant_id');

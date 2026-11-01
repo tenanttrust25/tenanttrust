@@ -28,7 +28,7 @@ class OwnerInvoiceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $navigationGroup = 'Owner Finance';
 
     protected static ?string $navigationLabel = 'Client Invoices';
 

@@ -19,10 +19,11 @@ class MaintenanceTicketResource extends Resource
 
     protected static ?string $navigationIcon = "heroicon-o-wrench-screwdriver";
     protected static ?string $navigationLabel = "Maintenance Tickets";
+    protected static ?string $navigationGroup = "Maintenance";
     protected static ?string $pluralModelLabel = "Maintenance Tickets";
     protected static ?string $modelLabel = "Maintenance Ticket";
     protected static ?string $slug = "maintenance";
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -130,11 +131,31 @@ class MaintenanceTicketResource extends Resource
                         Forms\Components\DateTimePicker::make("resolved_at")
                             ->label("Resolved At")
                             ->default(now()),
+                        Forms\Components\Select::make("vendor_id")
+                            ->label("Vendor (directory)")
+                            ->options(fn () => \App\Models\Vendor::orderBy("name")->pluck("name", "id"))
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                if ($state) {
+                                    $set("vendor", \App\Models\Vendor::find($state)?->name);
+                                }
+                            }),
+                        Forms\Components\TextInput::make("vendor")
+                            ->label("Contractor / Vendor (name)")
+                            ->maxLength(255)
+                            ->placeholder("e.g. ABC Plumbing"),
                         Forms\Components\TextInput::make("cost")
-                            ->label("Repair Cost ($)")
+                            ->label("Repair Cost ($) — passed to owner at cost")
                             ->numeric()
                             ->prefix("$")
                             ->placeholder("0.00"),
+                        Forms\Components\FileUpload::make("invoice_path")
+                            ->label("Contractor Invoice (optional)")
+                            ->directory("ticket-invoices")
+                            ->preserveFilenames()
+                            ->maxSize(8192)
+                            ->columnSpanFull(),
                     ]),
             ]);
     }

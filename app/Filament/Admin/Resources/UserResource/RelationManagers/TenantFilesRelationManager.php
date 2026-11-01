@@ -2,11 +2,13 @@
 
 namespace App\Filament\Admin\Resources\UserResource\RelationManagers;
 
+use App\Models\TenantFile;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
 
 class TenantFilesRelationManager extends RelationManager
 {
@@ -35,7 +37,19 @@ class TenantFilesRelationManager extends RelationManager
             ])
             ->filters([])
             ->headerActions([Tables\Actions\CreateAction::make()])
-            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
+            ->actions([
+                Tables\Actions\Action::make("view_file")
+                    ->label("View")
+                    ->icon("heroicon-o-eye")
+                    ->color("primary")
+                    ->url(fn (TenantFile $record): ?string => $record->file_path
+                        ? Storage::disk("public")->url($record->file_path)
+                        : null)
+                    ->openUrlInNewTab()
+                    ->visible(fn (TenantFile $record): bool => (bool) $record->file_path),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
             ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }
 }

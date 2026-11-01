@@ -5,10 +5,12 @@ namespace App\Services;
 class EmailDomainGuard
 {
     /**
-     * Whether an email address comes from a banned domain.
+     * Whether an email address comes from a banned domain or is an
+     * individually blocked address.
      *
      * Always blocks the site's own domain (from APP_URL) plus anything in
-     * config('contact.banned_domains'). Real visitors never email Tenant
+     * config('contact.banned_domains'), plus any exact address listed in
+     * config('contact.blocked_emails'). Real visitors never email Tenant
      * Trust from @tenanttrust.ca — only spammers spoof it — so those
      * submissions are silently dropped before any processing.
      */
@@ -16,6 +18,21 @@ class EmailDomainGuard
     {
         if ($email === null || !str_contains($email, '@')) {
             return false;
+        }
+
+        $email = strtolower(trim($email));
+
+        if ($email === '') {
+            return false;
+        }
+
+        // Exact-address blocks — for spammers reusing a mainstream domain
+        // (gmail, outlook, …) that cannot be banned wholesale.
+        foreach (config('contact.blocked_emails', []) as $blockedEmail) {
+            $blockedEmail = strtolower(trim((string) $blockedEmail));
+            if ($blockedEmail !== '' && $blockedEmail === $email) {
+                return true;
+            }
         }
 
         $domain = strtolower(trim((string) substr(strrchr($email, '@'), 1)));

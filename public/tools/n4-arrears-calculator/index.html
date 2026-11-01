@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ontario N4 Notice Calculator — Non-payment of Rent (2026) | Tenant Trust</title>
+<meta name="description" content="Free Ontario N4 calculator for non-payment of rent. Add the rent owing, pick a service date, and get the total rent owing, the correct N4 termination date (7-day rule, effective Sept 21 2026), and your L1 filing steps.">
+<link rel="canonical" href="https://tenanttrust.ca/tools/n4-arrears-calculator/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tenant Trust">
+<meta property="og:title" content="Ontario N4 Notice Calculator — Non-payment of Rent (2026) | Tenant Trust">
+<meta property="og:description" content="Free Ontario N4 calculator for non-payment of rent. Add the rent owing, pick a service date, and get the total rent owing, the correct N4 termination date (7-day rule, effective Sept 21 2026), and your L1 filing steps.">
+<meta property="og:url" content="https://tenanttrust.ca/tools/n4-arrears-calculator/">
+<meta property="og:image" content="https://tenanttrust.ca/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ontario N4 Notice Calculator — Non-payment of Rent (2026) | Tenant Trust">
+<meta name="twitter:description" content="Free Ontario N4 calculator for non-payment of rent. Add the rent owing, pick a service date, and get the total rent owing, the correct N4 termination date (7-day rule, effective Sept 21 2026), and your L1 filing steps.">
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--card:#fff;--accent:#0f766e;--accent2:#115e59;--warn:#b45309;--ok:#15803d}
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;gap:12px}
+  header img{height:34px}
+  header .brand{font-weight:700}
+  header .brand span{color:var(--accent)}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:1.5rem;line-height:1.2;margin:.2rem 0 .35rem;letter-spacing:-.4px}
+  .lede{color:var(--muted);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,.04);margin-bottom:16px}
+  label{display:block;font-weight:600;font-size:.86rem;margin:12px 0 5px}
+  label:first-child{margin-top:0}
+  .hint{font-weight:400;color:var(--muted);font-size:.8rem}
+  input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:1rem;background:#fff;color:var(--ink)}
+  input:focus,select:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.row{grid-template-columns:1fr}}
+  button.cta{width:100%;margin-top:16px;padding:13px;border:0;border-radius:11px;background:var(--accent);color:#fff;font-size:1.02rem;font-weight:700;cursor:pointer}
+  button.cta:hover{background:var(--accent2)}
+  .add{background:#f0fdfa;color:var(--accent2);border:1px dashed var(--accent);padding:8px 12px;border-radius:9px;font-weight:600;cursor:pointer;margin-top:10px}
+  .rowline{display:grid;grid-template-columns:1fr 120px 34px;gap:8px;margin-top:8px;align-items:center}
+  .del{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;padding:9px 0;font-weight:700;cursor:pointer}
+  .big{font-size:2rem;font-weight:800;letter-spacing:-1px;color:var(--accent)}
+  .big small{font-size:1rem;color:var(--muted);font-weight:600;letter-spacing:0}
+  table{width:100%;border-collapse:collapse;margin-top:6px}
+  td,th{padding:9px 4px;border-bottom:1px solid var(--line);text-align:left;font-size:.95rem}
+  td:last-child,th:last-child{text-align:right}
+  .verdict{font-size:1.02rem;font-weight:700;padding:12px 14px;border-radius:11px;margin-bottom:12px}
+  .v-ok{background:#ecfdf5;color:var(--ok);border:1px solid #a7f3d0}
+  .v-warn{background:#fffbeb;color:var(--warn);border:1px solid #fde68a}
+  .fine{font-size:.82rem;color:var(--muted)}
+  .disclaimer{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px;font-size:.82rem;color:#7c2d12}
+  .promo{background:linear-gradient(135deg,#0f766e,#0e7490);color:#fff;border-radius:14px;padding:18px}
+  .promo a{display:inline-block;background:#fff;color:var(--accent2);text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px;margin-top:8px}
+  nav.tools{font-size:.85rem;color:var(--muted);margin-bottom:10px}
+  nav.tools a{color:var(--accent);text-decoration:none}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px}
+</style>
+</head>
+<body>
+<header><img src="/logo-tt.svg" alt="Tenant Trust" onerror="this.style.display='none'"><div class="brand">Tenant <span>Trust</span></div></header>
+<div class="wrap">
+  <nav class="tools"><a href="/tools/">← All landlord tools</a></nav>
+  <h1>Ontario N4 Notice Calculator</h1>
+  <p class="lede">For non-payment of rent. Get your <b>total rent owing</b>, the correct <b>N4 termination date</b>, and your <b>L1</b> filing steps.</p>
+
+  <div class="card">
+    <label>Type of tenancy (how rent is paid)</label>
+    <select id="freq">
+      <option value="monthly" selected>Monthly</option>
+      <option value="biweekly">Bi-weekly</option>
+      <option value="weekly">Weekly</option>
+      <option value="daily">Daily</option>
+      <option value="yearly">Yearly</option>
+    </select>
+    <p class="fine" id="freqNote">Notice period for a monthly tenancy is at least <b>7 days</b> after the N4 is given (rule effective Sept 21, 2026).</p>
+
+    <label>Rent owing <span class="hint">— list each unpaid period (rent only)</span></label>
+    <div id="rows"></div>
+    <button class="add" id="addRow">+ Add another period</button>
+    <p class="fine">Only include <b>rent</b> (basic rent plus charges you bill separately for services like parking). Do <b>not</b> include the last month's rent deposit, NSF fees, or utilities paid to the utility.</p>
+
+    <div class="row" style="margin-top:14px">
+      <div><label for="dueDate">Rent due date <span class="hint">(optional)</span></label><input type="date" id="dueDate"></div>
+      <div><label for="serveDate">Date you will give the N4</label><input type="date" id="serveDate"></div>
+    </div>
+    <label for="method">How will you give the notice?</label>
+    <select id="method">
+      <option value="hand">In person / to the tenant</option>
+      <option value="mail">By mail</option>
+    </select>
+    <button class="cta" id="calcBtn">Calculate termination date</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="card">
+    <h3 style="margin-top:0">What happens after you serve an N4</h3>
+    <ul style="margin:6px 0 0;padding-left:18px">
+      <li>The tenant can <b>void</b> the notice by paying the full amount owing.</li>
+      <li>If they don't pay, you apply to the LTB with form <b>L1</b> — earliest <b>the day after the termination date</b>; there is <b>no filing deadline</b>, but file promptly.</li>
+      <li>The LTB <b>must</b> consider whether you tried to work out a <b>payment agreement</b>. Document your attempts.</li>
+      <li>File L1 online via the Tribunals Ontario Portal with a copy of the N4 and a <b>Certificate of Service</b>.</li>
+      <li>The N4 <b>must be signed and dated</b> and name <b>every</b> tenant in possession.</li>
+    </ul>
+  </div>
+
+  <div class="promo">
+    <h3 style="margin-top:0">Prefer not to do this yourself?</h3>
+    <p style="opacity:.92;margin:0">Tenant Trust serves notices, files with the LTB, and manages non-payment end-to-end — correctly, the first time.</p>
+    <a href="https://tenanttrust.ca/book">📞 Book a free 15-min call →</a>
+    <div style="margin-top:9px;font-size:.88rem;opacity:.95">Prefer to talk now? Call <a href="tel:+12495233331" style="display:inline;background:none;color:#fff;text-decoration:underline;font-weight:600;padding:0">249-523-3331</a></div>
+  </div>
+
+  <div class="disclaimer" style="margin-top:16px">
+    <b>General information — not legal advice.</b> Tenant Trust is not a law firm and does not represent anyone at the Landlord and Tenant Board. Forms and rules change — confirm the current N4 and its Instructions before serving. Serving by mail or courier adds deemed-service days; this tool uses +5 for mail. Never lock a tenant out or seize their belongings.
+  </div>
+  <footer>© <span id="yr"></span> Tenant Trust · tenanttrust.ca</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+function $(id){return document.getElementById(id);}
+function addDays(d,n){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x;}
+function parse(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function fmt(d){return d.toLocaleDateString('en-CA',{weekday:'short',year:'numeric',month:'long',day:'numeric'});}
+function money(n){return '$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+$('yr').textContent=new Date().getFullYear();
+
+var ROWS=$('rows');
+function addRow(label){
+  var div=document.createElement('div');div.className='rowline';
+  div.innerHTML='<input type="text" placeholder="e.g. October 2026 rent" value="'+(label||'')+'">'+
+                '<input type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal">'+
+                '<button class="del" type="button" title="Remove">×</button>';
+  div.querySelector('.del').addEventListener('click',function(){if(ROWS.children.length>1)div.remove();});
+  ROWS.appendChild(div);
+}
+addRow('Rent owing');
+$('addRow').addEventListener('click',function(){addRow('');});
+
+$('freq').addEventListener('change',function(){
+  var f=this.value;
+  $('freqNote').innerHTML = f==='weekly'||f==='daily'
+    ? 'Notice period for a weekly/daily tenancy is at least <b>7 days</b> after the N4 is given.'
+    : 'Notice period for this tenancy is at least <b>7 days</b> after the N4 is given (rule effective Sept 21, 2026).';
+});
+
+$('calcBtn').addEventListener('click',calc);
+function calc(){
+  var res=$('result');res.style.display='block';
+  var total=0;var items=[];
+  Array.prototype.forEach.call(ROWS.children,function(r){
+    var ins=r.querySelectorAll('input');
+    var amt=parseFloat(ins[1].value)||0;
+    if(amt>0){items.push({label:ins[0].value||'Rent',amt:amt});total+=amt;}
+  });
+  if(total<=0){res.innerHTML='<div class="card"><div class="verdict v-warn">Enter at least one rent amount owing to continue.</div></div>';return;}
+  var serveS=$('serveDate').value;
+  if(!serveS){res.innerHTML='<div class="card"><div class="verdict v-warn">Please enter the date you will give the N4.</div></div>';return;}
+  var served=parse(serveS),method=$('method').value;
+  var extra=(method==='mail')?5:0;
+  var term=addDays(served,7+extra);
+  var l1=addDays(term,1);
+  var warn='';
+  if($('dueDate').value){
+    var due=parse($('dueDate').value);
+    if(served.getTime()<=due.getTime())warn='<div class="verdict v-warn">⚠ You cannot give the N4 until the day <b>after</b> rent was due. Your service date is on or before the due date.</div>';
+  }
+  var h='<div class="card">'+warn;
+  h+='<div style="font-weight:700;color:#0f766e;margin-bottom:6px">Total rent owing</div>';
+  h+='<span class="big">'+money(total)+'</span>';
+  h+='<table>';
+  items.forEach(function(it){h+='<tr><td>'+escapeHtml(it.label)+'</td><td>'+money(it.amt)+'</td></tr>';});
+  h+='<tr><td><b>Total (goes in the N4 box)</b></td><td><b>'+money(total)+'</b></td></tr>';
+  h+='<tr><td>N4 given / served</td><td>'+fmt(served)+'</td></tr>';
+  h+='<tr><td>Method</td><td>'+(method==='mail'?'By mail (+5 days)':'In person')+'</td></tr>';
+  h+='<tr><td><b>Earliest termination date</b></td><td><b>'+fmt(term)+'</b></td></tr>';
+  h+='<tr><td>Earliest L1 filing</td><td>'+fmt(l1)+'</td></tr>';
+  h+='</table>';
+  h+='<p class="fine" style="margin-top:12px">The termination date must be at least 7 days after you give the notice (do not count the day you give it)'
+    +(method==='mail'?' — plus 5 calendar days for mail.'+'.':'.')
+    +' The N4 total must match the amount shown in the box on page 1. Sign and date the notice.</p>';
+  h+='</div>';
+  res.innerHTML=h;
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+})();
+</script>
+<script src="/tools/lead.js" defer></script>
+</body>
+</html>

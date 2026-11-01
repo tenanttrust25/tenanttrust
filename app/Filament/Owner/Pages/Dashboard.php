@@ -4,6 +4,8 @@ namespace App\Filament\Owner\Pages;
 
 use App\Models\Payout;
 use App\Models\Property;
+use App\Models\PropertyUnit;
+use App\Models\Tenancy;
 use App\Models\Invoice;
 use App\Models\MaintenanceTicket;
 use App\Models\TenantFile;
@@ -41,11 +43,18 @@ class Dashboard extends Page
         $propertyIds = $user->ownedProperties()->pluck('id');
 
         $this->totalUnits = $propertyIds->count();
-        $this->totalUnitCount = Property::whereIn('id', $propertyIds)->sum('unit_count');
-        $this->occupiedUnits = Property::whereIn('id', $propertyIds)->where('status', 'occupied')->count();
-        $this->vacantUnits = Property::whereIn('id', $propertyIds)->where('status', 'vacant')->count();
-        $this->occupancyRate = $this->totalUnits > 0
-            ? round(($this->occupiedUnits / $this->totalUnits) * 100)
+        $this->totalUnitCount = PropertyUnit::whereIn('property_id', $propertyIds)->count();
+
+        // Occupancy is per-UNIT based on actual active tenancies, not the
+        // property's status field. A unit with an active tenancy = occupied.
+        $unitIds = PropertyUnit::whereIn('property_id', $propertyIds)->pluck('id');
+        $this->occupiedUnits = Tenancy::whereIn('property_unit_id', $unitIds)
+            ->where('status', 'active')
+            ->distinct()
+            ->count('property_unit_id');
+        $this->vacantUnits = max(0, $this->totalUnitCount - $this->occupiedUnits);
+        $this->occupancyRate = $this->totalUnitCount > 0
+            ? round(($this->occupiedUnits / $this->totalUnitCount) * 100)
             : 0;
 
         $this->expectedIncome = Invoice::whereIn('property_id', $propertyIds)->sum('amount');

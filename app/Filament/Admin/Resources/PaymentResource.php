@@ -16,9 +16,10 @@ class PaymentResource extends Resource
     protected static ?string $navigationIcon = "heroicon-o-banknotes";
     protected static ?string $slug = "transactions";
     protected static ?string $navigationLabel = "Transactions";
+    protected static ?string $navigationGroup = "Rent & Billing";
     protected static ?string $pluralModelLabel = "Transactions";
     protected static ?string $modelLabel = "Transaction";
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {

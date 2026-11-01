@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Is My Unit Rent-Controlled in Ontario? (N1 vs N2) | Tenant Trust</title>
+<meta name="description" content="Free Ontario test: is your rental unit exempt from rent control? Answer a few questions to find out whether the rent increase guideline applies (Form N1) or your unit is exempt (Form N2).">
+<link rel="canonical" href="https://tenanttrust.ca/tools/rent-control-test/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tenant Trust">
+<meta property="og:title" content="Is My Unit Rent-Controlled in Ontario? (N1 vs N2) | Tenant Trust">
+<meta property="og:description" content="Free Ontario test: is your rental unit exempt from rent control? Answer a few questions to find out whether the rent increase guideline applies (Form N1) or your unit is exempt (Form N2).">
+<meta property="og:url" content="https://tenanttrust.ca/tools/rent-control-test/">
+<meta property="og:image" content="https://tenanttrust.ca/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Is My Unit Rent-Controlled in Ontario? (N1 vs N2) | Tenant Trust">
+<meta name="twitter:description" content="Free Ontario test: is your rental unit exempt from rent control? Answer a few questions to find out whether the rent increase guideline applies (Form N1) or your unit is exempt (Form N2).">
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--card:#fff;--accent:#0f766e;--accent2:#115e59;--warn:#b45309;--ok:#15803d;--ex:#0e7490}
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;gap:12px}
+  header img{height:34px}
+  header .brand{font-weight:700}header .brand span{color:var(--accent)}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:1.5rem;line-height:1.2;margin:.2rem 0 .35rem;letter-spacing:-.4px}
+  .lede{color:var(--muted);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,.04);margin-bottom:16px}
+  label{display:block;font-weight:600;font-size:.86rem;margin:12px 0 5px}
+  label:first-child{margin-top:0}
+  select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:1rem;background:#fff;color:var(--ink)}
+  select:focus{outline:2px solid var(--accent)}
+  .radio{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-top:6px;cursor:pointer}
+  .radio.sel{border-color:var(--accent);background:#f0fdfa}
+  .radio b{font-size:.92rem}.radio small{display:block;color:var(--muted);font-weight:400}
+  button.cta{width:100%;margin-top:16px;padding:13px;border:0;border-radius:11px;background:var(--accent);color:#fff;font-size:1.02rem;font-weight:700;cursor:pointer}
+  button.cta:hover{background:var(--accent2)}
+  .verdict{font-size:1.05rem;font-weight:700;padding:13px 15px;border-radius:11px;margin-bottom:12px}
+  .v-ok{background:#ecfdf5;color:var(--ok);border:1px solid #a7f3d0}
+  .v-ex{background:#ecfeff;color:var(--ex);border:1px solid #a5f3fc}
+  .v-warn{background:#fffbeb;color:var(--warn);border:1px solid #fde68a}
+  .fine{font-size:.82rem;color:var(--muted)}
+  .hidden{display:none}
+  .disclaimer{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px;font-size:.82rem;color:#7c2d12}
+  .promo{background:linear-gradient(135deg,#0f766e,#0e7490);color:#fff;border-radius:14px;padding:18px}
+  .promo a{display:inline-block;background:#fff;color:var(--accent2);text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px;margin-top:8px}
+  nav.tools{font-size:.85rem;color:var(--muted);margin-bottom:10px}nav.tools a{color:var(--accent);text-decoration:none}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px}
+</style>
+</head>
+<body>
+<header><img src="/logo-tt.svg" alt="Tenant Trust" onerror="this.style.display='none'"><div class="brand">Tenant <span>Trust</span></div></header>
+<div class="wrap">
+  <nav class="tools"><a href="/tools/">← All landlord tools</a></nav>
+  <h1>Is My Unit Rent-Controlled?</h1>
+  <p class="lede">The Nov 15, 2018 test decides whether the rent increase guideline caps your increases (<b>Form N1</b>) or your unit is exempt (<b>Form N2</b>).</p>
+
+  <div class="card">
+    <label for="type">What kind of unit is it?</label>
+    <select id="type">
+      <option value="building">Apartment in a building</option>
+      <option value="addition">A new addition to a building</option>
+      <option value="house_basement">Basement / second unit in a house</option>
+      <option value="condo">Condo unit</option>
+      <option value="mobile">Mobile home / land lease community</option>
+      <option value="whole_house">Whole house / other</option>
+    </select>
+
+    <label>Was anyone living in this unit for residential purposes <b>on or before Nov 15, 2018</b>?</label>
+    <div class="radio sel" id="rPre"><input type="radio" name="occ" value="pre" checked><div><b>Yes</b><small>Someone lived there on/before Nov 15, 2018</small></div></div>
+    <div class="radio" id="rPost"><input type="radio" name="occ" value="post"><div><b>No</b><small>First occupied after Nov 15, 2018</small></div></div>
+    <div class="radio" id="rUnsure"><input type="radio" name="occ" value="unsure"><div><b>Not sure</b></div></div>
+
+    <div id="basement" class="hidden">
+      <label>For a basement/second unit in a house, is <b>all</b> of this true?</label>
+      <div class="radio" id="bYes"><input type="radio" name="base" value="yes" checked><div><b>Yes</b><small>The house had ≤2 units before that date, the owner lived in another unit (or it was an unfinished space like a basement when first occupied), and it was created after Nov 15, 2018</small></div></div>
+      <div class="radio" id="bNo"><input type="radio" name="base" value="no"><div><b>No / not all of it</b></div></div>
+    </div>
+
+    <button class="cta" id="btn">Check my unit</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="card">
+    <h3 style="margin-top:0">In plain terms</h3>
+    <p class="fine" style="margin:0">Units first occupied <b>after Nov 15, 2018</b> (new buildings, new additions, most new basement units) are usually <b>exempt</b>: any increase is allowed on Form N2, though the <b>90-day notice</b> and <b>12-month</b> rules still apply. Everything older is <b>rent-controlled</b> (Form N1). If the exemption is disputed, the landlord must prove it.</p>
+  </div>
+
+  <div class="promo">
+    <h3 style="margin-top:0">Not sure which form to serve?</h3>
+    <p style="opacity:.92;margin:0">Tenant Trust handles rent increases and LTB forms for Ontario landlords — start to finish.</p>
+    <a href="https://tenanttrust.ca/book">📞 Book a free 15-min call →</a>
+    <div style="margin-top:9px;font-size:.88rem;opacity:.95">Prefer to talk now? Call <a href="tel:+12495233331" style="display:inline;background:none;color:#fff;text-decoration:underline;font-weight:600;padding:0">249-523-3331</a></div>
+  </div>
+
+  <div class="disclaimer" style="margin-top:16px">
+    <b>General information — not legal advice.</b> Tenant Trust is not a law firm and does not represent anyone at the LTB. Rules change — confirm against the RTA and current LTB forms before serving notice.
+  </div>
+  <footer>© <span id="yr"></span> Tenant Trust · tenanttrust.ca</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+$('yr').textContent=new Date().getFullYear();
+document.querySelectorAll('input[type=radio]').forEach(function(r){r.addEventListener('change',function(){
+  ['rPre','rPost','rUnsure','bYes','bNo'].forEach(function(id){var box=$(id);var i=box.querySelector('input');box.classList.toggle('sel',i.checked);});
+  $('basement').classList.toggle('hidden', !($('rPost').checked && ($('type').value==='house_basement')));
+});});
+$('type').addEventListener('change',function(){$('basement').classList.toggle('hidden', !($('rPost').checked && $('type').value==='house_basement'));});
+$('btn').addEventListener('click',function(){
+  var type=$('type').value;
+  var occ=document.querySelector('input[name=occ]:checked').value;
+  var base=(document.querySelector('input[name=base]:checked')||{}).value;
+  var res=$('result');res.style.display='block';var h='<div class="card">';
+  var exempt=false, reason='', unsure=(occ==='unsure');
+  if(occ==='pre'){exempt=false;reason='Because someone lived there on or before Nov 15, 2018, the unit is <b>rent-controlled</b>.';}
+  else if(occ==='post'){
+    if((type==='building'||type==='addition'||type==='mobile'||type==='condo'||type==='whole_house')){
+      exempt=true;reason='A '+(type==='condo'?'condo unit':'unit')+' in a building/enclosure first occupied after Nov 15, 2018 is generally <b>exempt</b> from the rent increase guideline.';
+    } else if(type==='house_basement'){
+      if(base==='yes'){exempt=true;reason='This self-contained unit in a house qualifies for the <b>exemption</b> (house had ≤2 units before Nov 15, 2018, owner occupied another unit / unfinished space, created after Nov 15, 2018).';}
+      else {exempt=false;reason='The house/second-unit exemption does <b>not</b> clearly apply, so the unit is treated as <b>rent-controlled</b>.';}
+    } else {exempt=true;reason='The unit appears <b>exempt</b> (first occupied after Nov 15, 2018).';}
+  }
+  if(unsure){
+    h+='<div class="verdict v-warn">⚠ Verify the first-occupancy date — it decides the answer.</div>';
+    h+='<p class="fine" style="margin-top:-4px">The unit\'s first-occupancy date is what matters, not when you bought it or when a tenant moved in. If you can\'t confirm it, treat the unit as rent-controlled (Form N1) until you can.</p>';
+  } else if(exempt){
+    h+='<div class="verdict v-ex">✓ Likely EXEMPT — any increase, Form N2</div>';
+    h+='<p style="margin-top:-4px">'+reason+'</p>';
+    h+='<p class="fine">You may increase rent by any amount, but you must still give <b>90 days\'</b> written notice on Form <b>N2</b> and wait <b>12 months</b> between increases.</p>';
+  } else {
+    h+='<div class="verdict v-ok">✓ Rent-controlled — guideline cap, Form N1</div>';
+    h+='<p style="margin-top:-4px">'+reason+'</p>';
+    h+='<p class="fine">Increase is capped at the guideline (<b>2.1%</b> for 2026, <b>1.9%</b> for 2027), on Form <b>N1</b>, with 90 days\' notice and 12 months between increases.</p>';
+  }
+  h+='<p class="fine">Also exempt/different: community housing, long-term care and commercial tenancies. On a new tenancy (turnover) the landlord may set a new rent.</p>';
+  h+='<p style="margin-top:8px"><a href="/tools/rent-increase-calculator/" style="color:#0f766e;font-weight:600">Work out the maximum increase →</a></p>';
+  h+='</div>';res.innerHTML=h;
+});
+})();
+</script>
+<script src="/tools/lead.js" defer></script>
+</body>
+</html>

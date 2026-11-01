@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,6 +25,7 @@ class FormResource extends Resource
 
     protected static ?string $navigationIcon = "heroicon-o-clipboard-document-list";
     protected static ?string $navigationLabel = "Forms";
+    protected static ?string $navigationGroup = "Leasing";
     protected static ?string $pluralModelLabel = "Forms";
     protected static ?string $modelLabel = "Form";
     protected static ?int $navigationSort = 3;
@@ -142,6 +144,13 @@ class FormResource extends Resource
                     ->action(function (Form $record) {
                         return Storage::disk("public")->download($record->file_path);
                     }),
+                DeleteAction::make()
+                    ->label("Delete")
+                    ->icon("heroicon-o-trash")
+                    ->color("danger")
+                    ->modalHeading("Delete form")
+                    ->modalDescription("This permanently deletes the form and its uploaded file. This cannot be undone.")
+                    ->successNotificationTitle("Form deleted"),
             ]);
     }
 

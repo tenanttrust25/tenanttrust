@@ -19,6 +19,10 @@ class InvoicesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->withSum(
+                ['payments as paid_sum' => fn ($q) => $q->where('status', 'completed')],
+                'amount'
+            ))
             ->columns([
                 TextColumn::make("invoice_number")
                     ->label("Invoice #")
@@ -34,8 +38,25 @@ class InvoicesRelationManager extends RelationManager
                     ->label("Amount")
                     ->money("CAD")
                     ->sortable(),
+                TextColumn::make("paid_sum")
+                    ->label("Paid")
+                    ->money("CAD")
+                    ->state(fn ($record) => ($record->status === "paid" || $record->credit_source_payment_id)
+                        ? (float) $record->amount
+                        : (float) ($record->paid_sum ?? 0))
+                    ->sortable(),
+                TextColumn::make("outstanding")
+                    ->label("Outstanding")
+                    ->money("CAD")
+                    ->state(fn ($record) => ($record->status === "paid" || $record->credit_source_payment_id)
+                        ? 0.0
+                        : max(0, (float) $record->amount - (float) ($record->paid_sum ?? 0)))
+                    ->color(fn ($record) => (($record->status === "paid" || $record->credit_source_payment_id)
+                        ? 0.0
+                        : max(0, (float) $record->amount - (float) ($record->paid_sum ?? 0))) > 0 ? "danger" : "success"),
                 BadgeColumn::make("status")
                     ->label("Status")
+                    ->sortable()
                     ->colors([
                         "warning" => "pending",
                         "success" => "paid",

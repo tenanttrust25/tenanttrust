@@ -164,7 +164,7 @@
                         </div>
 
                         <a href="{{ route('rental-application.create', ['unit' => $activeUnit?->id]) }}" class="btn btn-gold" style="margin-bottom:10px;">Apply Now</a>
-                        <a href="/contact" class="btn btn-outline" style="display:block;text-align:center;padding:12px;">Inquire About This Property</a>
+                        <a href="{{ route('properties.inquire', $activeUnit?->slug ?? $property->slug) }}" class="btn btn-outline" style="display:block;text-align:center;padding:12px;">Inquire About This Property</a>
                         <a href="/properties" class="btn btn-outline" style="display:block;text-align:center;padding:12px;margin-top:10px;">← Back to Properties</a>
 
                         <div style="margin-top:24px;padding:20px;background:#FFFFFF;border-radius:8px;">

@@ -51,4 +51,24 @@
             </div>
         </div>
     @endif
+
+    <div>
+        <p class="text-sm font-medium text-gray-500 mb-2">Conversation</p>
+
+        @php($replies = $ticket->replies()->with("user")->orderBy("created_at")->get())
+
+        @forelse($replies as $reply)
+            <div class="mb-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700">
+                <div class="flex items-center justify-between gap-2 text-xs text-gray-500">
+                    <span class="font-medium text-gray-700 dark:text-gray-300">
+                        {{ $reply->user_id === auth()->id() ? "You" : ($reply->user?->name ?? "Property Manager") }}
+                    </span>
+                    <span>{{ $reply->created_at?->format("M j, Y g:i A") }}</span>
+                </div>
+                <p class="mt-1 whitespace-pre-wrap text-sm text-gray-900 dark:text-gray-100">{{ $reply->message }}</p>
+            </div>
+        @empty
+            <p class="text-sm text-gray-500 dark:text-gray-400">No replies yet. Use the Reply action to message the property manager.</p>
+        @endforelse
+    </div>
 </div>

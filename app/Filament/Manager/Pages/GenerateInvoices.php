@@ -15,6 +15,7 @@ class GenerateInvoices extends Page
 {
     protected static ?string $navigationIcon = "heroicon-o-document-plus";
     protected static ?string $navigationLabel = "Generate Invoices";
+    protected static ?string $navigationGroup = "Rent & Billing";
     protected static ?string $title = "Generate Monthly Invoices";
     protected static ?string $slug = "generate-invoices";
     protected static ?int $navigationSort = 2;
@@ -90,6 +91,7 @@ class GenerateInvoices extends Page
                                 "tenant_id" => $tenancy->tenant_id,
                                 "property_id" => $tenancy->property_id,
                                 "invoice_number" => "INV-" . date("Y") . "-" . strtoupper(Str::random(8)),
+                                "type" => "rent",
                                 "amount" => $tenancy->rent_amount,
                                 "description" => $description,
                                 "due_date" => $dueDate,

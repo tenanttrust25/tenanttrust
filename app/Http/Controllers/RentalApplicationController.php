@@ -205,13 +205,25 @@ class RentalApplicationController extends Controller
             'signature_date' => $validated['signature_date'] ?? null,
         ]);
 
-        // Notify admin
+        // Notify admin, and send each owner their own copy. One shared email
+        // used to CC owners on the admin message, whose button points at
+        // /admin — owners are role "owner" and got 403 Access denied.
         try {
             Mail::mailer("smtp")
                 ->to("info@tenanttrust.ca")
-                ->send(new RentalApplicationMail($application));
+                ->send(new RentalApplicationMail($application, 'admin'));
+
+            foreach ($application->ownerEmails() as $ownerEmail) {
+                Mail::mailer("smtp")
+                    ->to($ownerEmail)
+                    ->send(new RentalApplicationMail($application, 'owner'));
+            }
         } catch (\Exception $e) {
-            // Email failure shouldn't block the applicant
+            // Email failure shouldn't block the applicant — but leave a trace.
+            \Illuminate\Support\Facades\Log::warning('Rental application notification failed', [
+                'application_id' => $application->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return redirect()

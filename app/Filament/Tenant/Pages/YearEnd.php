@@ -11,7 +11,8 @@ class YearEnd extends Page
     protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
     protected static ?string $title = 'Year End';
     protected static ?string $navigationLabel = 'Year End';
-    protected static ?int $navigationSort = 99;
+    protected static ?string $navigationGroup = 'Rent & Billing';
+    protected static ?int $navigationSort = 3;
 
     protected static string $view = 'filament.tenant.year-end';
 

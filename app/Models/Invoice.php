@@ -17,12 +17,21 @@ class Invoice extends Model
         'property_id',
         'property_unit_id',
         'invoice_number',
+        'type',
         'amount',
         'description',
         'due_date',
         'status',
+        'credit_source_payment_id',
         'file_path',
     ];
+
+    protected static function booted(): void
+    {
+        // When a new invoice appears, let any unapplied payment credit settle it
+        // (so future months keep showing "paid" until an over-payment is used up).
+        static::created(fn (Invoice $invoice) => app(\App\Services\PaymentAllocationService::class)->applyCreditToInvoice($invoice));
+    }
 
     protected $casts = [
         'amount' => 'decimal:2',

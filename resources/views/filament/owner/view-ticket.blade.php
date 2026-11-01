@@ -66,6 +66,31 @@
                 </div>
             </div>
 
+            {{-- Maintenance costs — transparent pass-through --}}
+            @if($this->getTicket()->cost || $this->getTicket()->vendor || $this->getTicket()->invoice_path)
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="font-bold mb-4 uppercase text-sm tracking-wide" class="text-gray-900 dark:text-white" style="font-family: Manrope, sans-serif;">Maintenance Costs</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Contractor / Vendor</p>
+                        <p class="font-medium">{{ $this->getTicket()->vendor ?? "—" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Cost</p>
+                        <p class="font-medium">{{ $this->getTicket()->cost ? "$" . number_format((float) $this->getTicket()->cost, 2) : "—" }}</p>
+                    </div>
+                    @if($this->getTicket()->invoice_path)
+                    <div>
+                        <a href="{{ asset("storage/" . $this->getTicket()->invoice_path) }}" target="_blank" class="inline-flex items-center gap-1 text-sm font-medium" style="color:#0F172A;">
+                            View contractor invoice →
+                        </a>
+                    </div>
+                    @endif
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Passed through at cost — Tenant Trust adds no markup.</p>
+                </div>
+            </div>
+            @endif
+
             {{-- Photos --}}
             @if($this->getTicket()->photos && count($this->getTicket()->photos) > 0)
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">

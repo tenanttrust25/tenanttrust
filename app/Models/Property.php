@@ -10,6 +10,7 @@ class Property extends Model
 {
     protected $fillable = [
         "owner_id",
+        "co_owner_id",
         "title",
         "slug",
         "description",
@@ -51,6 +52,11 @@ class Property extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, "owner_id");
+    }
+
+    public function coOwner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, "co_owner_id");
     }
 
     public function units(): HasMany

@@ -18,9 +18,10 @@ class RentalApplicationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 
-    protected static ?string $navigationGroup = 'Content';
+    protected static ?string $navigationGroup = 'Leasing';
 
     protected static ?string $navigationLabel = 'Rental Applications';
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $pluralModelLabel = 'Rental Applications';
 
@@ -51,6 +52,27 @@ class RentalApplicationResource extends Resource
                     ])
                     ->default('pending'),
             ]);
+    }
+
+    /**
+     * Quick-pick reasons shown as buttons when declining an application.
+     */
+    public static function declineReasons(): array
+    {
+        return [
+            'Missing address' => 'Missing address',
+            'Missing landlord name' => 'Missing landlord name',
+            'Missing landlord contact' => 'Missing landlord contact',
+            'No photo ID' => 'No photo ID',
+            'No proof of employment' => 'No proof of employment',
+            'Insufficient income' => 'Insufficient income',
+            'Incomplete application' => 'Incomplete application',
+            'Rental history concerns' => 'Rental history concerns',
+            'Credit concerns' => 'Credit concerns',
+            'Eviction history' => 'Eviction history',
+            'Property no longer available' => 'Property no longer available',
+            'Other' => 'Other',
+        ];
     }
 
     public static function table(Table $table): Table
@@ -118,32 +140,210 @@ class RentalApplicationResource extends Resource
                     ->schema([
                         Infolists\Components\TextEntry::make('full_name')
                             ->label('Name'),
+                        Infolists\Components\TextEntry::make('status')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'pending' => 'warning',
+                                'reviewed' => 'info',
+                                'approved' => 'success',
+                                'declined' => 'danger',
+                                default => 'gray',
+                            }),
                         Infolists\Components\TextEntry::make('date_of_birth')
                             ->label('Date of Birth')
-                            ->date(),
+                            ->date()
+                            ->placeholder('—'),
                         Infolists\Components\TextEntry::make('email'),
-                        Infolists\Components\TextEntry::make('phone'),
+                        Infolists\Components\TextEntry::make('phone')
+                            ->label('Home Phone')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('alternative_phone')
+                            ->label('Alternative Phone')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('desired_move_in_date')
+                            ->label('Desired Move-In Date')
+                            ->date()
+                            ->placeholder('—'),
                         Infolists\Components\TextEntry::make('created_at')
                             ->label('Submitted')
                             ->dateTime(),
                     ])
                     ->columns(2),
-                Infolists\Components\Section::make('Application Details')
+                Infolists\Components\Section::make('Applying For')
                     ->schema([
                         Infolists\Components\TextEntry::make('address_applying_for')
-                            ->label('Address Applying For'),
+                            ->label('Property')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
                         Infolists\Components\TextEntry::make('propertyUnit.unit')
-                            ->label('Unit #'),
+                            ->label('Unit #')
+                            ->placeholder('—'),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Co-Applicant')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('co_applicant_name')
+                            ->label('Full Name')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('co_applicant_dob')
+                            ->label('Date of Birth')
+                            ->date()
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('co_applicant_email')
+                            ->label('Email')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('co_applicant_phone')
+                            ->label('Home Phone')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('co_applicant_alt_phone')
+                            ->label('Alternative Phone')
+                            ->placeholder('—'),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Other Occupants')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('occupant_1_name')
+                            ->label('Occupant 1 — Name')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('occupant_1_relation')
+                            ->label('Occupant 1 — Relation')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('occupant_1_dob')
+                            ->label('Occupant 1 — Date of Birth')
+                            ->date()
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('occupant_2_name')
+                            ->label('Occupant 2 — Name')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('occupant_2_relation')
+                            ->label('Occupant 2 — Relation')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('occupant_2_dob')
+                            ->label('Occupant 2 — Date of Birth')
+                            ->date()
+                            ->placeholder('—'),
+                    ])
+                    ->columns(3),
+                Infolists\Components\Section::make('Rental History — Current Residence')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('current_address')
+                            ->label('Current Address')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('current_duration')
+                            ->label('Resided Here For')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('current_monthly_rent')
+                            ->label('Monthly Rent')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('current_landlord_name')
+                            ->label("Landlord's Name")
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('current_landlord_contact')
+                            ->label("Landlord's Contact")
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('current_reason_leaving')
+                            ->label('Reason(s) for Leaving')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Rental History — Previous Residence')
+                    ->schema([
                         Infolists\Components\TextEntry::make('previous_address')
                             ->label('Previous Address')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('previous_duration')
+                            ->label('Stayed For')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('previous_monthly_rent')
+                            ->label('Monthly Rent')
                             ->placeholder('—'),
                         Infolists\Components\TextEntry::make('landlord_name')
-                            ->label('Landlord Name')
+                            ->label("Landlord's Name")
                             ->placeholder('—'),
                         Infolists\Components\TextEntry::make('landlord_contact')
-                            ->label('Landlord Contact')
+                            ->label("Landlord's Contact")
                             ->placeholder('—'),
-                    ]),
+                        Infolists\Components\TextEntry::make('previous_reason_leaving')
+                            ->label('Reason(s) for Leaving')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Screening Questions')
+                    ->schema([
+                        Infolists\Components\IconEntry::make('ever_evicted')
+                            ->label('Ever been evicted?')
+                            ->boolean(),
+                        Infolists\Components\IconEntry::make('missed_payments')
+                            ->label('Missed 2+ payments in 12 months?')
+                            ->boolean(),
+                        Infolists\Components\IconEntry::make('refused_rent')
+                            ->label('Ever refused to pay rent when due?')
+                            ->boolean(),
+                        Infolists\Components\TextEntry::make('rental_issues_explanation')
+                            ->label('Explanation')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(3),
+                Infolists\Components\Section::make('Employment — Current')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('employment_status')
+                            ->label('Employment Status')
+                            ->formatStateUsing(fn (?string $state): string => match ($state) {
+                                'full_time' => 'Full-time',
+                                'part_time' => 'Part-time',
+                                'student' => 'Student',
+                                'unemployed' => 'Unemployed',
+                                'retired' => 'Retired',
+                                default => $state ? ucfirst(str_replace('_', ' ', $state)) : '—',
+                            }),
+                        Infolists\Components\TextEntry::make('employer_name')
+                            ->label('Employer')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('job_title')
+                            ->label('Job Title')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('supervisor_name')
+                            ->label("Supervisor's Name")
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('supervisor_phone')
+                            ->label("Supervisor's Phone")
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('date_hired')
+                            ->label('Date Hired')
+                            ->date()
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('monthly_income')
+                            ->label('Monthly Income')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('other_income')
+                            ->label('Other Sources of Income')
+                            ->placeholder('—'),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Employment — Previous')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('previous_employer')
+                            ->label('Previous Employer')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('previous_job_title')
+                            ->label('Job Title')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('previous_supervisor')
+                            ->label("Supervisor's Name")
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('previous_supervisor_phone')
+                            ->label("Supervisor's Phone")
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('employment_period')
+                            ->label('Period of Employment')
+                            ->placeholder('—'),
+                    ])
+                    ->columns(2),
                 Infolists\Components\Section::make('Documents')
                     ->schema([
                         Infolists\Components\TextEntry::make('gov_id_path')
@@ -153,7 +353,7 @@ class RentalApplicationResource extends Resource
                             ->openUrlInNewTab()
                             ->icon('heroicon-o-arrow-down-tray'),
                         Infolists\Components\TextEntry::make('proof_of_employment_path')
-                            ->label('Proof of Employment')
+                            ->label('Proof of Income / Employment')
                             ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : 'No file uploaded')
                             ->url(fn (?string $state): ?string => $state ? \Illuminate\Support\Facades\Storage::disk('public')->url($state) : null)
                             ->openUrlInNewTab()
@@ -165,15 +365,16 @@ class RentalApplicationResource extends Resource
                         Infolists\Components\IconEntry::make('has_pets')
                             ->label('Has Pets')
                             ->boolean(),
-                        Infolists\Components\TextEntry::make('pets_details')
-                            ->label('Pet Details')
-                            ->placeholder('—'),
                         Infolists\Components\IconEntry::make('is_smoker')
                             ->label('Smoker')
                             ->boolean(),
+                        Infolists\Components\TextEntry::make('pets_details')
+                            ->label('Pet Details')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
                     ])
-                    ->columns(3),
-                Infolists\Components\Section::make('Consent')
+                    ->columns(2),
+                Infolists\Components\Section::make('Credit & Background Check Authorization')
                     ->schema([
                         Infolists\Components\IconEntry::make('consent_credit_check')
                             ->label('Soft Credit Check Consent')
@@ -181,8 +382,43 @@ class RentalApplicationResource extends Resource
                         Infolists\Components\IconEntry::make('consent_background_check')
                             ->label('Criminal Background Check Consent')
                             ->boolean(),
+                        Infolists\Components\TextEntry::make('credit_check_comments')
+                            ->label('Credit Check Comments')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('criminal_check_comments')
+                            ->label('Criminal Check Comments')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
+                Infolists\Components\Section::make('Declaration & Signature')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('applicant_signature')
+                            ->label("Applicant's Signature")
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('co_applicant_signature')
+                            ->label("Co-Applicant's Signature")
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('signature_date')
+                            ->label('Date')
+                            ->date()
+                            ->placeholder('—'),
+                    ])
+                    ->columns(3),
+                Infolists\Components\Section::make('Decline')
+                    ->visible(fn (?RentalApplication $record): bool => $record?->status === 'declined')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('decline_reasons')
+                            ->label('Reason(s)')
+                            ->badge()
+                            ->color('danger')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('decline_notes')
+                            ->label('Notes')
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 

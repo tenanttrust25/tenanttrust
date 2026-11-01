@@ -4,6 +4,7 @@ namespace App\Filament\Tenant\Resources\MaintenanceTicketResource\Pages;
 
 use App\Filament\Tenant\Resources\MaintenanceTicketResource;
 use App\Models\Tenancy;
+use App\Models\User;
 use App\Services\PushNotificationService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
@@ -51,6 +52,21 @@ class CreateMaintenanceTicket extends CreateRecord
             } catch (\Exception $e) {
                 Log::warning("Owner ticket push failed: " . $e->getMessage());
             }
+        }
+
+        // Notify property managers about the new ticket
+        try {
+            $managers = User::whereIn('role', ['manager', 'admin'])->get();
+            if ($managers->isNotEmpty()) {
+                app(PushNotificationService::class)->sendToUsers(
+                    $managers,
+                    'New maintenance request',
+                    "{$this->record->tenant?->name} submitted: {$this->record->title} (#{$this->record->ticket_number})",
+                    url('/manager/maintenance-tickets')
+                );
+            }
+        } catch (\Exception $e) {
+            Log::warning("Manager ticket push failed: " . $e->getMessage());
         }
     }
 

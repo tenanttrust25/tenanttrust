@@ -14,9 +14,11 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = "heroicon-o-user-plus";
+    protected static ?string $navigationIcon = "heroicon-o-users";
 
-    protected static ?string $navigationLabel = "Add Tenant";
+    protected static ?string $navigationLabel = "Tenants";
+
+    protected static ?string $navigationGroup = "Tenants";
 
     protected static ?string $modelLabel = "Tenant";
 
@@ -87,6 +89,7 @@ class UserResource extends Resource
                                         "lease" => "Lease Agreement",
                                         "N1" => "N1 Form",
                                         "N4" => "N4 Form",
+                                        "N9" => "N9 Form",
                                         "other" => "Other",
                                     ])
                                     ->default("lease")

@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'twilio/escalate',
             'twilio/maintenance',
             'twilio/dial-result',
+            'twilio/whisper',
+            'twilio/askname',
             'twilio/record',
         ]);
 

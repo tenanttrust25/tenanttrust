@@ -26,7 +26,7 @@ class UserInvitationMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $role = $this->user->role === "manager" ? "Property Manager" : "Client";
+        $role = $this->roleLabel($this->user->role);
         return new Envelope(
             subject: "Welcome to Tenant Trust — Your {$role} Account",
         );
@@ -34,7 +34,7 @@ class UserInvitationMail extends Mailable
 
     public function content(): Content
     {
-        $role = $this->user->role === "manager" ? "Property Manager" : "Client";
+        $role = $this->roleLabel($this->user->role);
         return new Content(
             markdown: "emails.user-invitation",
             with: [
@@ -49,5 +49,16 @@ class UserInvitationMail extends Mailable
     public function attachments(): array
     {
         return [];
+    }
+
+    private function roleLabel(string $role): string
+    {
+        return match ($role) {
+            "manager" => "Property Manager",
+            "owner" => "Client",
+            "tenant" => "Tenant",
+            "previous_tenant" => "Previous Tenant",
+            default => "User",
+        };
     }
 }

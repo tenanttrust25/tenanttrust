@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Mail\RemindersDueMail;
 use App\Models\Reminder;
 use App\Models\User;
+use App\Services\PushNotificationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -38,6 +39,20 @@ class NotifyDueReminders extends Command
         }
 
         foreach ($admins as $admin) {
+            try {
+                app(PushNotificationService::class)->sendToUser(
+                    $admin,
+                    'Reminders due',
+                    $due->count() . ' reminder' . ($due->count() > 1 ? 's' : '') . ' need your attention.',
+                    url('/admin/reminders')
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Due-reminder push failed', [
+                    'admin' => $admin->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             if (! $admin->email) {
                 continue;
             }

@@ -13,7 +13,7 @@ You have a new invoice from Tenant Trust.
 Click Here to View Invoice
 </x-mail::button>
 
-If you have any questions, please contact us at info@tenanttrust.ca or call (705) 555-0123.
+If you have any questions, please contact us at info@tenanttrust.ca or call 249-523-3331.
 
 Thanks,<br>
 **Tenant Trust**

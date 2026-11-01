@@ -8,6 +8,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PropertyUnit extends Model
 {
+    protected static function booted(): void
+    {
+        // The rent_amount column is NOT NULL (default 0.00). Guard every save
+        // path so clearing the field / setting a unit vacant stores 0 instead
+        // of null (which would throw an integrity constraint violation).
+        static::saving(function (PropertyUnit $unit) {
+            if ($unit->rent_amount === null) {
+                $unit->rent_amount = 0;
+            }
+            if ($unit->status === null) {
+                $unit->status = 'vacant';
+            }
+        });
+    }
+
     public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);

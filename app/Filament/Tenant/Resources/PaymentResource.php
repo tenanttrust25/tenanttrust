@@ -18,7 +18,8 @@ class PaymentResource extends Resource
     protected static ?string $navigationLabel = "Transactions";
     protected static ?string $pluralModelLabel = "Transactions";
     protected static ?string $modelLabel = "Transaction";
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'Rent & Billing';
+    protected static ?int $navigationSort = 2;
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {

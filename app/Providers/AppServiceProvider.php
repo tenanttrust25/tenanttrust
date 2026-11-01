@@ -15,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        \App\Models\FormSubmission::observe(\App\Observers\FormSubmissionObserver::class);
+        \App\Models\N9Submission::observe(\App\Observers\N9SubmissionObserver::class);
     }
 }

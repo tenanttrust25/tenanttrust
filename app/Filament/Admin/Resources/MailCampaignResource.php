@@ -18,7 +18,7 @@ class MailCampaignResource extends Resource
 {
     protected static ?string $model = MailCampaign::class;
     protected static ?string $navigationIcon = 'heroicon-o-megaphone';
-    protected static ?string $navigationGroup = 'Mail Campaigns';
+    protected static ?string $navigationGroup = 'Mail';
     protected static ?string $navigationLabel = 'Campaigns';
     protected static ?int $navigationSort = 2;
 
@@ -59,12 +59,24 @@ class MailCampaignResource extends Resource
             ])->columns(2),
 
             Forms\Components\Section::make('Audience')
-                ->description('Select which tenants will receive this campaign.')
+                ->description('Choose who receives this campaign.')
                 ->schema([
+                    Forms\Components\Select::make('audience_type')
+                        ->label('Send To')
+                        ->options([
+                            'tenants' => 'Tenants',
+                            'clients' => 'Clients (Owners)',
+                            'both' => 'Tenants + Clients',
+                        ])
+                        ->default('tenants')
+                        ->live()
+                        ->required()
+                        ->helperText('Clients = property owners. Tenants can be filtered by property below.'),
                     Forms\Components\Select::make('audience_filter')
-                        ->label('Filter By Property')
+                        ->label('Filter Tenants By Property')
                         ->multiple()
                         ->options(\App\Models\Property::pluck('title', 'id'))
+                        ->visible(fn (Forms\Get $get) => in_array($get('audience_type'), ['tenants', 'both']))
                         ->helperText('Leave empty to send to ALL tenants. Select specific properties to filter.'),
                 ]),
         ]);

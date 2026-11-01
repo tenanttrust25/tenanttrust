@@ -41,6 +41,11 @@ class SendMailCampaign
 
                 $body = $template->body;
                 $body = str_replace('{{tracking_pixel}}', $trackingPixel, $body);
+                // If the template didn't include the placeholder, append the
+                // pixel anyway so opens still get tracked.
+                if (!str_contains($body, $trackingPixel)) {
+                    $body .= $trackingPixel;
+                }
                 $body = str_replace('{{unsubscribe_url}}', $unsubscribeUrl, $body);
                 $body = str_replace('{{tenant_name}}', $recipient->tenant?->name ?? 'Tenant', $body);
                 $body = str_replace('{{tenant_email}}', $recipient->tenant?->email ?? '', $body);
@@ -48,10 +53,16 @@ class SendMailCampaign
 
                 $subject = $template->subject ?? $campaign->title;
 
-                Mail::html($body, function ($message) use ($recipient, $subject, $campaign) {
+                Mail::html($body, function ($message) use ($recipient, $subject, $campaign, $unsubscribeUrl) {
                     $message->to($recipient->email)
                         ->subject($subject)
-                        ->from('noreply@tenanttrust.ca', 'Tenant Trust');
+                        ->from(config('mail.from.address'), config('mail.from.name', 'Tenant Trust'));
+
+                    // Bulk-sender best practice (Gmail/Yahoo 2024 rules): advertise
+                    // the unsubscribe URL so receivers can surface a one-click
+                    // opt-out. Only applied to campaign (bulk) mail, never to
+                    // transactional notices/invoices.
+                    $message->getHeaders()->addTextHeader('List-Unsubscribe', '<' . $unsubscribeUrl . '>');
                 });
 
                 $recipient->update([
@@ -60,8 +71,22 @@ class SendMailCampaign
                 ]);
                 $sentCount++;
             } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning("Campaign #{$campaign->id} send failed to {$recipient->email}: " . $e->getMessage());
                 $recipient->update(['status' => 'bounced']);
             }
+
+            // Force a fresh SMTP connection per message. Stalwart caps
+            // messages per session (452), and Laravel reuses one connection
+            // for the whole loop — so without this, bulk campaigns die
+            // after the first ~10 sends.
+            try {
+                \Illuminate\Support\Facades\Mail::mailer()->getSymfonyTransport()->stop();
+            } catch (\Throwable $e) {
+                // ignore transport teardown errors
+            }
+
+            // Pace sends to avoid SMTP rate limiting.
+            usleep(250000);
         }
 
         $campaign->increment('sent_count', $sentCount);

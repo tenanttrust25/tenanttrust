@@ -26,7 +26,8 @@ class InvoiceResource extends Resource
     protected static ?string $navigationLabel = "Invoices";
     protected static ?string $pluralModelLabel = "Invoices";
     protected static ?string $modelLabel = "Invoice";
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'Rent & Billing';
+    protected static ?int $navigationSort = 1;
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {

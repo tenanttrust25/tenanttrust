@@ -18,7 +18,8 @@ class ContactSubmissionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
-    protected static ?string $navigationGroup = 'Content';
+    protected static ?string $navigationGroup = 'Website';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -30,6 +31,14 @@ class ContactSubmissionResource extends Resource
                     ->disabled(),
                 Forms\Components\TextInput::make('phone')
                     ->disabled(),
+                Forms\Components\TextInput::make('property.title')
+                    ->label('Property')
+                    ->disabled()
+                    ->placeholder('General inquiry'),
+                Forms\Components\TextInput::make('propertyUnit.unit')
+                    ->label('Unit')
+                    ->disabled()
+                    ->placeholder('—'),
                 Forms\Components\Textarea::make('message')
                     ->disabled()
                     ->columnSpanFull(),
@@ -43,6 +52,11 @@ class ContactSubmissionResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('property.title')
+                    ->label('Property')
+                    ->placeholder('General')
+                    ->wrap()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -69,6 +83,12 @@ class ContactSubmissionResource extends Resource
                 Infolists\Components\TextEntry::make('name'),
                 Infolists\Components\TextEntry::make('email'),
                 Infolists\Components\TextEntry::make('phone'),
+                Infolists\Components\TextEntry::make('property.title')
+                    ->label('Property')
+                    ->placeholder('General inquiry'),
+                Infolists\Components\TextEntry::make('propertyUnit.unit')
+                    ->label('Unit')
+                    ->placeholder('—'),
                 Infolists\Components\TextEntry::make('message')
                     ->columnSpanFull(),
                 Infolists\Components\TextEntry::make('created_at')

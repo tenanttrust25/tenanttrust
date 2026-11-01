@@ -35,6 +35,7 @@ class GenerateInvoicesAction
                     'property_id' => $unit->property_id,
                     'property_unit_id' => $unit->id,
                     'invoice_number' => $invNumber,
+                    'type' => 'rent',
                     'amount' => $unit->rent_amount,
                     'description' => 'Monthly Rent - ' . $unit->unit . ' - ' . ($unit->property->title ?? ''),
                     'due_date' => $dueDate,

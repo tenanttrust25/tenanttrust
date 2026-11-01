@@ -25,6 +25,9 @@ class MaintenanceTicket extends Model
         "resolved_at",
         "category",
         "cost",
+        "vendor",
+        "vendor_id",
+        "invoice_path",
     ];
 
     protected $casts = [
@@ -46,6 +49,11 @@ class MaintenanceTicket extends Model
     public function propertyUnit(): BelongsTo
     {
         return $this->belongsTo(PropertyUnit::class, "property_unit_id");
+    }
+
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
     }
 
     public function assignedTo(): BelongsTo

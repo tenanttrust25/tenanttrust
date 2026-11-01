@@ -21,10 +21,11 @@ class InvoiceResource extends Resource
 
     protected static ?string $navigationIcon = "heroicon-o-currency-dollar";
     protected static ?string $navigationLabel = "Invoices / Payments";
+    protected static ?string $navigationGroup = "Rent & Billing";
     protected static ?string $pluralModelLabel = "Invoices";
     protected static ?string $modelLabel = "Invoice";
     protected static ?string $slug = "invoices";
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {

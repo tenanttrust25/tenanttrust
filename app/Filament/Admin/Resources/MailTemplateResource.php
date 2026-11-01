@@ -14,7 +14,7 @@ class MailTemplateResource extends Resource
 {
     protected static ?string $model = MailTemplate::class;
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationGroup = 'Mail Campaigns';
+    protected static ?string $navigationGroup = 'Mail';
     protected static ?string $navigationLabel = 'Templates';
     protected static ?int $navigationSort = 1;
 

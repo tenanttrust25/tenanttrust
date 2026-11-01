@@ -16,9 +16,14 @@ class PropertyResource extends Resource
 {
     protected static ?string $model = Property::class;
 
+    // Tenant Trust standard management fee (percent of rent). When a rent amount
+    // is entered for a unit, the per-unit management fee is auto-filled from it.
+    public const MANAGEMENT_FEE_PERCENT = 6.1;
+
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
     protected static ?string $navigationGroup = 'Properties';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -78,9 +83,31 @@ class PropertyResource extends Resource
                                 'active' => 'Active',
                                 'rented' => 'Rented',
                                 'sold' => 'Sold',
+                                'inactive' => 'Inactive (not managed)',
                             ])
                             ->default('active')
                             ->helperText('Building-level status shown on the properties list'),
+                    ]),
+
+                Forms\Components\Section::make('Management Fee')
+                    ->description('How Tenant Trust charges this property. The property-level fee overrides per-unit fees.')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('management_fee_type')
+                            ->label('Fee Type')
+                            ->options([
+                                'percentage' => 'Percentage of rent (per unit invoice)',
+                                'flat' => 'Flat $ per unit (per unit invoice)',
+                                'flat_monthly' => 'Flat $ per property, once per month',
+                            ])
+                            ->native(false)
+                            ->nullable()
+                            ->helperText('Percentage / Flat = charged on every unit rent invoice. "Flat monthly" = one charge per property per month.'),
+                        Forms\Components\TextInput::make('management_fee_value')
+                            ->label('Fee Value (% or $)')
+                            ->numeric()
+                            ->nullable()
+                            ->helperText('Percentage: 6.1 means 6.1%. Flat: dollars (e.g. 60). Flat monthly: dollars per property per month.'),
                     ]),
 
 
@@ -139,7 +166,28 @@ class PropertyResource extends Resource
                                     ->label('Rent Amount ($)')
                                     ->numeric()
                                     ->prefix('$')
-                                    ->default(0),
+                                    ->default(0)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (Forms\Set $set, $state, $record = null) {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        // Flat-fee buildings (e.g. 137 Hillsboro / 178 Dell,
+                                        // $60/unit) keep their fixed per-unit charge.
+                                        $property = $record?->property;
+                                        if ($property && in_array($property->management_fee_type, ['flat', 'flat_monthly'], true)) {
+                                            return;
+                                        }
+
+                                        $rate = self::MANAGEMENT_FEE_PERCENT;
+                                        if ($property && $property->management_fee_type === 'percentage'
+                                            && $property->management_fee_value !== null) {
+                                            $rate = (float) $property->management_fee_value;
+                                        }
+
+                                        $set('monthly_management_fee', round(((float) $state) * $rate / 100, 2));
+                                    }),
 
                                 Forms\Components\Select::make('tenant_id')
                                     ->label('Tenant')
@@ -201,7 +249,7 @@ class PropertyResource extends Resource
                                     ->multiple()
                                     ->maxFiles(5)
                                     ->directory('properties/videos')
-                                    ->maxSize(102400)
+                                    ->maxSize(512000)
                                     ->mimeTypeMap([
                                         'mp4' => 'video/mp4',
                                         'webm' => 'video/webm',
@@ -236,6 +284,7 @@ class PropertyResource extends Resource
                         'success' => 'active',
                         'danger' => 'rented',
                         'gray' => 'sold',
+                        'warning' => 'inactive',
                     ]),
                 Tables\Columns\IconColumn::make('featured')
                     ->boolean()
@@ -251,6 +300,7 @@ class PropertyResource extends Resource
                         'active' => 'Active',
                         'rented' => 'Rented',
                         'sold' => 'Sold',
+                        'inactive' => 'Inactive (not managed)',
                     ]),
                 Tables\Filters\TernaryFilter::make('featured'),
             ])

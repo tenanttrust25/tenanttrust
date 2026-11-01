@@ -15,7 +15,8 @@ class Portfolio extends Page
     protected static ?string $navigationIcon = "heroicon-o-building-office";
     protected static ?string $title = "Portfolio";
     protected static ?string $navigationLabel = "Portfolio";
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'Properties';
+    protected static ?int $navigationSort = 1;
     protected static string $view = "filament.owner.portfolio";
 
     public function getProperties()
@@ -36,6 +37,12 @@ class Portfolio extends Page
     public function getFilesForTenant($tenantId)
     {
         return TenantFile::where("tenant_id", $tenantId)->get();
+    }
+
+    public function getOutstandingBalance($tenantId)
+    {
+        $user = \App\Models\User::find($tenantId);
+        return $user ? $user->outstandingBalance() : 0;
     }
 
     public function getRentAmount($propertyId)

@@ -49,6 +49,26 @@ class Tenancy extends Model
                 }
             }
         });
+
+        // Business rule: a tenant can never be active in more than one unit.
+        // Whenever a tenancy becomes active, any other active tenancy for the
+        // same tenant is automatically closed (e.g. tenant moves units).
+        static::saved(function (Tenancy $tenancy) {
+            if ($tenancy->status !== 'active') {
+                return;
+            }
+
+            Tenancy::where('tenant_id', $tenancy->tenant_id)
+                ->where('status', 'active')
+                ->where('id', '!=', $tenancy->id)
+                ->get()
+                ->each(function (Tenancy $other) {
+                    $other->update([
+                        'status' => 'expired',
+                        'move_out_date' => $other->move_out_date ?? now()->toDateString(),
+                    ]);
+                });
+        });
     }
 
     public function property(): BelongsTo

@@ -71,7 +71,7 @@
         {{-- Footer --}}
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0 16px;" />
         <div style="text-align:center;font-size:12px;color:#9ca3af;">
-            Tenant Trust Inc. &bull; 123 Main Street West, Sudbury, ON P3E 4T2 &bull; info@tenanttrust.ca &bull; (705) 555-0123
+            Tenant Trust &bull; 474 McKim St Unit 3, Sudbury, ON P3C 2L6 &bull; info@tenanttrust.ca &bull; 249-523-3331
         </div>
     </div>
 </x-filament-panels::page>

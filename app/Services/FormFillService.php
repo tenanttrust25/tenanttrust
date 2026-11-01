@@ -6,7 +6,9 @@ use App\Models\Form;
 use App\Models\Tenancy;
 use App\Models\User;
 use Carbon\Carbon;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -31,6 +33,10 @@ class FormFillService
     protected const SIGNER_PHONE = '249-523-3331';
     protected const SIGNER_NAME = 'Steve Ouimette (Property Manager)';
     protected const SIGNER_SIGNATURE = 'Steve Ouimette';
+
+    /** Tenant Trust (the manager) — default representative details on notices. */
+    protected const MANAGER_COMPANY = 'Tenant Trust';
+    protected const MANAGER_EMAIL = 'info@tenanttrust.ca';
 
     public function categories(): array
     {
@@ -92,6 +98,19 @@ class FormFillService
             $unitAddress .= ' — Unit ' . $unit->unit;
         }
 
+        // Structured unit-address parts used by the redesigned N4 (2026/09).
+        $streetNumber = null;
+        $streetName = trim((string) $property?->address);
+        if ($streetName !== '' && preg_match('/^\s*(\d+[A-Za-z]?)\s+(.*)$/', $streetName, $m)) {
+            $streetNumber = $m[1];
+            $streetName = trim($m[2]);
+        }
+        $unitLabel = null;
+        if ($unit?->unit) {
+            $rawUnit = trim((string) $unit->unit);
+            $unitLabel = preg_match('/^\d+[A-Za-z]?$/', $rawUnit) ? 'Unit ' . $rawUnit : $rawUnit;
+        }
+
         [$tFirst, $tLast] = $this->splitName($tenant->name);
         [$oFirst, $oLast] = $this->splitName($owner?->name ?? '');
 
@@ -108,6 +127,20 @@ class FormFillService
             'landlord_phone' => $owner?->phone ?? '',
             'landlord_address' => ($owner?->address ?: $property?->address) ?? '',
             'unit_address' => $unitAddress,
+            'unit_street_number' => $streetNumber,
+            'unit_street_name' => $streetName ?: null,
+            'unit_number' => $unitLabel,
+            'unit_city' => $property?->city,
+            'unit_province' => strtoupper(substr(trim((string) ($property?->province ?: 'ON')), 0, 2)) ?: 'ON',
+            'unit_postal' => $property?->postal_code,
+            'manager_company' => self::MANAGER_COMPANY,
+            'manager_email' => self::MANAGER_EMAIL,
+            'manager_street_number' => '474',
+            'manager_street_name' => 'McKim St',
+            'manager_unit' => 'Unit 3',
+            'manager_city' => 'Sudbury',
+            'manager_province' => 'ON',
+            'manager_postal' => 'P3C 2L6',
             'property_id' => $property?->id,
             'property_unit_id' => $unit?->id,
             'owner_id' => $owner?->id,
@@ -156,29 +189,64 @@ class FormFillService
             'n4' => [
                 'n4_tenant_name' => $ctx['tenant_names'],
                 'n4_landlord_name' => $ctx['landlord_name'],
-                'n4_unit_address' => $ctx['unit_address'],
+                'n4_amount_owing' => null,
                 'n4_pay_date' => $today,
+                'n4_street_number' => $ctx['unit_street_number'] ?? '',
+                'n4_street_name' => $ctx['unit_street_name'] ?? '',
+                'n4_unit' => $ctx['unit_number'] ?? '',
+                'n4_city' => $ctx['unit_city'] ?? '',
+                'n4_province' => $ctx['unit_province'] ?? 'ON',
+                'n4_postal_code' => $ctx['unit_postal'] ?? '',
                 'n4_signer' => self::SIGNER_ROLE,
                 'n4_signer_first_name' => self::SIGNER_FIRST,
                 'n4_signer_last_name' => self::SIGNER_LAST,
                 'n4_signer_phone' => self::SIGNER_PHONE,
                 'n4_signature' => self::SIGNER_SIGNATURE,
                 'n4_sign_date' => $today,
+                'n4_rep_first_name' => self::SIGNER_FIRST,
+                'n4_rep_last_name' => self::SIGNER_LAST,
+                'n4_rep_lso' => '',
+                'n4_rep_company' => $ctx['manager_company'] ?? self::MANAGER_COMPANY,
+                'n4_rep_street_number' => $ctx['manager_street_number'] ?? '',
+                'n4_rep_street_name' => $ctx['manager_street_name'] ?? '',
+                'n4_rep_unit' => $ctx['manager_unit'] ?? '',
+                'n4_rep_city' => $ctx['manager_city'] ?? '',
+                'n4_rep_province' => $ctx['manager_province'] ?? 'ON',
+                'n4_rep_postal_code' => $ctx['manager_postal'] ?? '',
+                'n4_rep_email' => $ctx['manager_email'] ?? self::MANAGER_EMAIL,
+                'n4_rep_phone' => self::SIGNER_PHONE,
             ],
             'n5' => [
                 'n5_tenant_name' => $ctx['tenant_names'],
                 'n5_landlord_name' => $ctx['landlord_name'],
-                'n5_unit_address' => $ctx['unit_address'],
+                'n5_street_number' => $ctx['unit_street_number'] ?? '',
+                'n5_street_name' => $ctx['unit_street_name'] ?? '',
+                'n5_unit' => $ctx['unit_number'] ?? '',
+                'n5_city' => $ctx['unit_city'] ?? '',
+                'n5_province' => $ctx['unit_province'] ?? 'ON',
+                'n5_postal_code' => $ctx['unit_postal'] ?? '',
                 'n5_termination_date' => $today,
-                'n5_reason1_option' => '7day',
-                'n5_reason2_option' => '7day',
-                'n5_reason3_option' => '7day',
+                'n5_reason1_option' => 'first',
+                'n5_reason2_option' => 'first',
+                'n5_reason3_option' => 'first',
                 'n5_signer' => self::SIGNER_ROLE,
                 'n5_signer_first_name' => self::SIGNER_FIRST,
                 'n5_signer_last_name' => self::SIGNER_LAST,
                 'n5_signer_phone' => self::SIGNER_PHONE,
                 'n5_signature' => self::SIGNER_SIGNATURE,
                 'n5_sign_date' => $today,
+                'n5_rep_first_name' => self::SIGNER_FIRST,
+                'n5_rep_last_name' => self::SIGNER_LAST,
+                'n5_rep_lso' => '',
+                'n5_rep_company' => $ctx['manager_company'] ?? self::MANAGER_COMPANY,
+                'n5_rep_street_number' => $ctx['manager_street_number'] ?? '',
+                'n5_rep_street_name' => $ctx['manager_street_name'] ?? '',
+                'n5_rep_unit' => $ctx['manager_unit'] ?? '',
+                'n5_rep_city' => $ctx['manager_city'] ?? '',
+                'n5_rep_province' => $ctx['manager_province'] ?? 'ON',
+                'n5_rep_postal_code' => $ctx['manager_postal'] ?? '',
+                'n5_rep_email' => $ctx['manager_email'] ?? self::MANAGER_EMAIL,
+                'n5_rep_phone' => self::SIGNER_PHONE,
             ],
             'n11' => [
                 'n11_tenant_names' => $ctx['tenant_names'],
@@ -225,8 +293,14 @@ class FormFillService
     {
         return match ($category) {
             'n1' => ['Date ddmmyyyy' => ['helv', 12], 'Signature' => ['helv', 12]],
-            'n5' => ['Signature' => ['helv', 12], 'SignDate' => ['helv', 12]],
-            'n4' => ['Signature' => ['helv', 12], 'SignDate' => ['helv', 12]],
+            'n5' => [
+                'form1[0].sfrmForm[0].Signature[0].Signature[0]' => ['helv', 12],
+                'form1[0].sfrmForm[0].Signature[0].dptSignDate[0]' => ['helv', 12],
+            ],
+            'n4' => [
+                'form1[0].sfrmForm[0].Signature[0].Signature[0]' => ['helv', 12],
+                'form1[0].sfrmForm[0].Signature[0].dptSignDate[0]' => ['helv', 12],
+            ],
             'n11' => ['Date ddmmyyyy_2' => ['helv', 12]],
             'n9' => ['Date ddmmyyyy' => ['helv', 12]],
             default => [],
@@ -401,14 +475,36 @@ class FormFillService
     protected function n4Schema(array $ctx): array
     {
         return [
-            TextInput::make('n4_tenant_name')->label("Tenant's Name")->default($ctx['tenant_names']),
-            TextInput::make('n4_landlord_name')->label("Landlord's Name")->default($ctx['landlord_name']),
-            TextInput::make('n4_unit_address')->label('Address of the Rental Unit')
-                ->default($ctx['unit_address'])->columnSpanFull(),
-            TextInput::make('n4_amount_owing')->label('Amount of rent owing ($)')->numeric(),
-            DatePicker::make('n4_pay_date')->label('Pay by / termination date')
-                ->native(false)->displayFormat('M d, Y')->default($ctx['today']),
-            Repeater::make('n4_arrears')->label('Rent arrears breakdown (optional)')
+            TextInput::make('n4_tenant_name')->label("Tenant's name (include all tenant names)")
+                ->default($ctx['tenant_names'])->columnSpanFull(),
+            TextInput::make('n4_landlord_name')->label("Landlord's name")
+                ->default($ctx['landlord_name'])->columnSpanFull(),
+            TextInput::make('n4_amount_owing')->label('Amount of rent owing ($)')
+                ->numeric()
+                ->helperText('The box on page 1. Must equal the Total Rent Owing in the table below (it is auto-filled from the table if you leave it blank).'),
+            DatePicker::make('n4_pay_date')->label('Termination date — pay or move out by (dd/mm/yyyy)')
+                ->native(false)->displayFormat('M d, Y')->default($ctx['today'])
+                ->helperText('At least 7 days after the notice is served — add extra days if delivered by mail or courier.'),
+
+            \Filament\Forms\Components\Section::make('Address of the rental unit')
+                ->columns(6)
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('n4_street_number')->label('Street number')->columnSpan(2)
+                        ->default($ctx['unit_street_number'] ?? ''),
+                    TextInput::make('n4_street_name')->label('Street name')->columnSpan(4)
+                        ->default($ctx['unit_street_name'] ?? ''),
+                    TextInput::make('n4_unit')->label('Unit/Apt./Suite')->columnSpan(2)
+                        ->default($ctx['unit_number'] ?? ''),
+                    TextInput::make('n4_city')->label('Municipality (city, town, etc.)')->columnSpan(2)
+                        ->default($ctx['unit_city'] ?? ''),
+                    TextInput::make('n4_province')->label('Province')->columnSpan(1)
+                        ->default($ctx['unit_province'] ?? 'ON'),
+                    TextInput::make('n4_postal_code')->label('Postal code')->columnSpan(1)
+                        ->default($ctx['unit_postal'] ?? ''),
+                ]),
+
+            Repeater::make('n4_arrears')->label('Rent owing — how the total is calculated')
                 ->schema([
                     DatePicker::make('from')->label('Period from')->native(false)->displayFormat('M d, Y'),
                     DatePicker::make('to')->label('Period to')->native(false)->displayFormat('M d, Y'),
@@ -416,37 +512,101 @@ class FormFillService
                     TextInput::make('paid')->label('Rent paid ($)')->numeric(),
                 ])
                 ->columns(4)->maxItems(3)->defaultItems(0)->columnSpanFull()
-                ->helperText('Owing is calculated per row (charged − paid); the total is filled in automatically.'),
-            Select::make('n4_signer')->label('Signing as')->options(['landlord' => 'Landlord', 'representative' => 'Representative'])->default(self::SIGNER_ROLE),
-            TextInput::make('n4_signer_first_name')->label('Signer first name')->default(self::SIGNER_FIRST),
-            TextInput::make('n4_signer_last_name')->label('Signer last name')->default(self::SIGNER_LAST),
-            TextInput::make('n4_signer_phone')->label('Signer phone')->default(self::SIGNER_PHONE),
-            TextInput::make('n4_signature')->label('Signature (typed name)')->default(self::SIGNER_SIGNATURE),
-            DatePicker::make('n4_sign_date')->label('Date signed')->native(false)->displayFormat('M d, Y')->default($ctx['today']),
+                ->helperText('Rent owing is calculated per row (charged − paid); the Total Rent Owing fills in automatically.'),
+
+            \Filament\Forms\Components\Section::make('Signature')
+                ->columns(2)
+                ->columnSpanFull()
+                ->schema([
+                    Select::make('n4_signer')->label('Signing as')
+                        ->options(['landlord' => 'Landlord', 'representative' => 'Representative'])
+                        ->default(self::SIGNER_ROLE)->live()->columnSpanFull(),
+                    TextInput::make('n4_signer_first_name')->label('First name')->default(self::SIGNER_FIRST),
+                    TextInput::make('n4_signer_last_name')->label('Last name')->default(self::SIGNER_LAST),
+                    TextInput::make('n4_signer_phone')->label('Phone number')->default(self::SIGNER_PHONE)->columnSpanFull(),
+                    TextInput::make('n4_signature')->label('Signature (typed name)')->default(self::SIGNER_SIGNATURE),
+                    DatePicker::make('n4_sign_date')->label('Date signed (dd/mm/yyyy)')->native(false)->displayFormat('M d, Y')->default($ctx['today']),
+                ]),
+
+            \Filament\Forms\Components\Section::make('Representative information')
+                ->description('Completed only when the notice is signed by a representative.')
+                ->columns(2)
+                ->columnSpanFull()
+                ->visible(fn (Get $get): bool => $get('n4_signer') === 'representative')
+                ->schema([
+                    TextInput::make('n4_rep_first_name')->label('First name')->default(self::SIGNER_FIRST),
+                    TextInput::make('n4_rep_last_name')->label('Last name')->default(self::SIGNER_LAST),
+                    TextInput::make('n4_rep_lso')->label('LSO number (if applicable)'),
+                    TextInput::make('n4_rep_company')->label('Company name (if applicable)')
+                        ->default($ctx['manager_company'] ?? self::MANAGER_COMPANY),
+                    TextInput::make('n4_rep_street_number')->label('Street number')
+                        ->default($ctx['manager_street_number'] ?? ''),
+                    TextInput::make('n4_rep_street_name')->label('Street name')
+                        ->default($ctx['manager_street_name'] ?? ''),
+                    TextInput::make('n4_rep_unit')->label('Unit/Apt./Suite')
+                        ->default($ctx['manager_unit'] ?? ''),
+                    TextInput::make('n4_rep_city')->label('Municipality')
+                        ->default($ctx['manager_city'] ?? ''),
+                    TextInput::make('n4_rep_province')->label('Province')
+                        ->default($ctx['manager_province'] ?? 'ON'),
+                    TextInput::make('n4_rep_postal_code')->label('Postal code')
+                        ->default($ctx['manager_postal'] ?? ''),
+                    TextInput::make('n4_rep_email')->label('Email address')
+                        ->default($ctx['manager_email'] ?? self::MANAGER_EMAIL),
+                    TextInput::make('n4_rep_phone')->label('Phone number')->default(self::SIGNER_PHONE),
+                ]),
         ];
     }
 
     protected function n4Values(array $data, array $ctx): array
     {
         $sign = Carbon::parse($data['n4_sign_date'] ?? $ctx['today']);
-        $pay = isset($data['n4_pay_date']) && $data['n4_pay_date'] ? Carbon::parse($data['n4_pay_date']) : null;
+        $pay = ! empty($data['n4_pay_date']) ? Carbon::parse($data['n4_pay_date']) : null;
         $signer = $data['n4_signer'] ?? self::SIGNER_ROLE;
 
+        // The on-disk template is the redesigned LTB N4 (2026/09). Its widgets are
+        // nested and use different names from the old N4, so map by the full
+        // widget path — the short-name fallback in fill_form.py can collide
+        // (e.g. txtNumber/txtCity exist in both the unit-address and rep blocks).
         $values = [
-            'TO_TenameName' => $data['n4_tenant_name'] ?? null,
-            'From_LandlordName' => $data['n4_landlord_name'] ?? null,
-            'RentalUnitAddress' => $data['n4_unit_address'] ?? null,
-            'OweMeAmount' => $data['n4_amount_owing'] ?? null,
-            'PayDate' => $pay?->format('d/m/Y'),
-            'SelectSign#0' => $signer === 'landlord' ? 'X' : null,
-            'SelectSign#1' => $signer === 'representative' ? 'X' : null,
-            'RFirstName' => $data['n4_signer_first_name'] ?? null,
-            'RLastName' => $data['n4_signer_last_name'] ?? null,
-            'RDayPhone' => $data['n4_signer_phone'] ?? null,
-            'Signature' => $data['n4_signature'] ?? null,
-            'SignDate' => $sign->format('d/m/Y'),
+            // Page 1 (notice): amount owing, termination date, parties, unit address
+            'form1[0].sfrmForm[0].InfofromLandlord1[0].dptPayDate[0]' => $pay?->format('d/m/Y'),
+            'form1[0].sfrmForm[0].PartyAddressInfo[0].txtTenant[0]' => $data['n4_tenant_name'] ?? null,
+            'form1[0].sfrmForm[0].PartyAddressInfo[0].txtLandlord[0]' => $data['n4_landlord_name'] ?? null,
+            'form1[0].sfrmForm[0].PartyAddressInfo[0].txtNumber[0]' => $data['n4_street_number'] ?? null,
+            'form1[0].sfrmForm[0].PartyAddressInfo[0].txtName[0]' => $data['n4_street_name'] ?? null,
+            'form1[0].sfrmForm[0].PartyAddressInfo[0].txtUnit[0]' => $data['n4_unit'] ?? null,
+            'form1[0].sfrmForm[0].PartyAddressInfo[0].txtCity[0]' => $data['n4_city'] ?? null,
+            'form1[0].sfrmForm[0].PartyAddressInfo[0].txtProvince[0]' => $data['n4_province'] ?: 'ON',
+            'form1[0].sfrmForm[0].PartyAddressInfo[0].txtPostalCode[0]' => $data['n4_postal_code'] ?? null,
+
+            // Signature block
+            'form1[0].sfrmForm[0].Signature[0].PartyType[0]#0' => $signer === 'landlord' ? 'X' : null,
+            'form1[0].sfrmForm[0].Signature[0].PartyType[0]#1' => $signer === 'representative' ? 'X' : null,
+            'form1[0].sfrmForm[0].Signature[0].txtFirstName[0]' => $data['n4_signer_first_name'] ?? null,
+            'form1[0].sfrmForm[0].Signature[0].txtLastName[0]' => $data['n4_signer_last_name'] ?? null,
+            'form1[0].sfrmForm[0].Signature[0].txtPhone1[0]' => $data['n4_signer_phone'] ?? null,
+            'form1[0].sfrmForm[0].Signature[0].Signature[0]' => $data['n4_signature'] ?? null,
+            'form1[0].sfrmForm[0].Signature[0].dptSignDate[0]' => $sign->format('d/m/Y'),
         ];
 
+        if ($signer === 'representative') {
+            $rep = 'form1[0].sfrmForm[0].LegalRepInfo[0].sfrmLegalRepInfo_1[0].';
+            $values[$rep . 'txtFirstName[0]'] = $data['n4_rep_first_name'] ?? null;
+            $values[$rep . 'txtLastName[0]'] = $data['n4_rep_last_name'] ?? null;
+            $values[$rep . 'txtLSOnumber[0]'] = $data['n4_rep_lso'] ?? null;
+            $values[$rep . 'txtCompanyName[0]'] = $data['n4_rep_company'] ?? null;
+            $values[$rep . 'txtNumber[0]'] = $data['n4_rep_street_number'] ?? null;
+            $values[$rep . 'txtName[0]'] = $data['n4_rep_street_name'] ?? null;
+            $values[$rep . 'txtUnit[0]'] = $data['n4_rep_unit'] ?? null;
+            $values[$rep . 'txtCity[0]'] = $data['n4_rep_city'] ?? null;
+            $values[$rep . 'txtProvince[0]'] = $data['n4_rep_province'] ?: 'ON';
+            $values[$rep . 'txtPostalCode[0]'] = $data['n4_rep_postal_code'] ?? null;
+            $values[$rep . 'txtEmail[0]'] = $data['n4_rep_email'] ?? null;
+            $values[$rep . 'txtPhone1[0]'] = $data['n4_rep_phone'] ?? null;
+        }
+
+        // Rent-owing table + Total Rent Owing
         $total = 0.0;
         $rows = $data['n4_arrears'] ?? [];
         foreach (range(1, 3) as $i) {
@@ -458,15 +618,23 @@ class FormFillService
             $paid = (float) ($row['paid'] ?? 0);
             $owe = $charged - $paid;
             $total += $owe;
-            $values["ArrearFrom{$i}"] = isset($row['from']) && $row['from'] ? Carbon::parse($row['from'])->format('d/m/Y') : null;
-            $values["ArrearTo{$i}"] = isset($row['to']) && $row['to'] ? Carbon::parse($row['to'])->format('d/m/Y') : null;
-            $values["RentCharge{$i}"] = number_format($charged, 2);
-            $values["RentPaid{$i}"] = number_format($paid, 2);
-            $values["RentOwe{$i}"] = number_format($owe, 2);
+            $base = "form1[0].sfrmForm[0].InfofromLandlord2[0].RentOwing[0].Row{$i}[0].";
+            $values[$base . "DateFrom{$i}[0]"] = ! empty($row['from']) ? Carbon::parse($row['from'])->format('d/m/Y') : null;
+            $values[$base . "DateTo{$i}[0]"] = ! empty($row['to']) ? Carbon::parse($row['to'])->format('d/m/Y') : null;
+            $values[$base . "Charged{$i}[0]"] = number_format($charged, 2);
+            $values[$base . "Paid{$i}[0]"] = number_format($paid, 2);
+            $values[$base . "Owing{$i}[0]"] = number_format($owe, 2);
         }
         if ($total != 0.0) {
-            $values['TotalRentOwe'] = number_format($total, 2);
+            $values['form1[0].sfrmForm[0].InfofromLandlord2[0].TotalRentOwing[0]'] = number_format($total, 2);
         }
+
+        // Page 1 amount owing: the typed amount, otherwise the table total.
+        $amount = $data['n4_amount_owing'] ?? null;
+        if ($amount === null || $amount === '') {
+            $amount = $total != 0.0 ? $total : null;
+        }
+        $values['form1[0].sfrmForm[0].InfofromLandlord1[0].txtOweMeAmount[0]'] = $amount !== null ? number_format((float) $amount, 2) : null;
 
         return $values;
     }
@@ -478,40 +646,132 @@ class FormFillService
     protected function n5Schema(array $ctx): array
     {
         return [
-            TextInput::make('n5_tenant_name')->label("Tenant's Name")->default($ctx['tenant_names']),
-            TextInput::make('n5_landlord_name')->label("Landlord's Name")->default($ctx['landlord_name']),
-            TextInput::make('n5_unit_address')->label('Address of the Rental Unit')
-                ->default($ctx['unit_address'])->columnSpanFull(),
+            \Filament\Forms\Components\Section::make('Notice details')
+                ->columns(2)
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('n5_tenant_name')->label("Tenant's name (include all tenant names)")
+                        ->default($ctx['tenant_names'])->columnSpanFull(),
+                    TextInput::make('n5_landlord_name')->label("Landlord's name")
+                        ->default($ctx['landlord_name'])->columnSpanFull(),
+                ]),
+
+            \Filament\Forms\Components\Section::make('Address of the rental unit')
+                ->columns(6)
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('n5_street_number')->label('Street number')->columnSpan(2)
+                        ->default($ctx['unit_street_number'] ?? ''),
+                    TextInput::make('n5_street_name')->label('Street name')->columnSpan(4)
+                        ->default($ctx['unit_street_name'] ?? ''),
+                    TextInput::make('n5_unit')->label('Unit/Apt./Suite')->columnSpan(2)
+                        ->default($ctx['unit_number'] ?? ''),
+                    TextInput::make('n5_city')->label('Municipality (city, town, etc.)')->columnSpan(2)
+                        ->default($ctx['unit_city'] ?? ''),
+                    TextInput::make('n5_province')->label('Province')->columnSpan(1)
+                        ->default($ctx['unit_province'] ?? 'ON'),
+                    TextInput::make('n5_postal_code')->label('Postal code')->columnSpan(1)
+                        ->default($ctx['unit_postal'] ?? ''),
+                ]),
+
             DatePicker::make('n5_termination_date')->label('Termination date (move-out date)')
-                ->native(false)->displayFormat('M d, Y')->default($ctx['today']),
-            Toggle::make('n5_reason1')->label('Reason 1 — substantial interference with reasonable enjoyment')->live(),
-            Select::make('n5_reason1_option')->label('Reason 1 option')
-                ->options(['7day' => '7 days to correct (first notice)', 'immediate' => 'Apply immediately (2nd notice in 6 months)'])
-                ->default('7day')->visible(fn (Get $get): bool => (bool) $get('n5_reason1')),
-            Toggle::make('n5_reason2')->label('Reason 2 — wilful or negligent damage')->live(),
-            Select::make('n5_reason2_option')->label('Reason 2 option')
-                ->options(['7day' => '7 days to correct (first notice)', 'immediate' => 'Apply immediately (2nd notice in 6 months)'])
-                ->default('7day')->visible(fn (Get $get): bool => (bool) $get('n5_reason2')),
-            TextInput::make('n5_pay_repair')->label('Cost to repair the damages ($)')->numeric()->columnSpan(1),
-            TextInput::make('n5_pay_replace')->label('Cost to replace the damaged property ($)')->numeric()->columnSpan(1),
-            Toggle::make('n5_reason3')->label('Reason 3 — more people than permitted (overcrowding)')->live(),
-            Select::make('n5_reason3_option')->label('Reason 3 option')
-                ->options(['7day' => '7 days to correct (first notice)', 'immediate' => 'Apply immediately (2nd notice in 6 months)'])
-                ->default('7day')->visible(fn (Get $get): bool => (bool) $get('n5_reason3')),
-            TextInput::make('n5_reason3_people')->label('Reduce number of people to (specify)')
-                ->visible(fn (Get $get): bool => (bool) $get('n5_reason3')),
+                ->native(false)->displayFormat('M d, Y')->default($ctx['today'])
+                ->helperText('First N5: at least 20 days after service. Second N5 (within 6 months): at least 14 days. Add extra days for mail/courier.'),
+
+            \Filament\Forms\Components\Section::make('Reason 1 — substantial interference')
+                ->columns(1)->columnSpanFull()
+                ->schema([
+                    Checkbox::make('n5_reason1')->label('Include Reason 1 (checks the Reason 1 box on the form)')->live(),
+                    Radio::make('n5_reason1_option')
+                        ->label('Reason 1 — select the notice wording')
+                        ->options([
+                            'first' => 'You have 7 days to stop the activities or correct the behaviour described on page 2 and avoid eviction.',
+                            'second' => 'I can apply to the LTB immediately for an order to evict you.',
+                        ])
+                        ->default('first')
+                        ->visible(fn (Get $get): bool => (bool) $get('n5_reason1')),
+                ]),
+
+            \Filament\Forms\Components\Section::make('Reason 2 — wilful or negligent damage')
+                ->columns(1)->columnSpanFull()
+                ->schema([
+                    Checkbox::make('n5_reason2')->label('Include Reason 2 (checks the Reason 2 box on the form)')->live(),
+                    Radio::make('n5_reason2_option')
+                        ->label('Reason 2 — select the notice wording')
+                        ->options([
+                            'first' => 'You have 7 days to correct the problem(s) described on page 2 and avoid eviction.',
+                            'second' => 'I can apply to the LTB immediately for an order to evict you.',
+                        ])
+                        ->default('first')
+                        ->visible(fn (Get $get): bool => (bool) $get('n5_reason2')),
+                    TextInput::make('n5_pay_repair')->label('Cost to repair the damages ($)')->numeric()
+                        ->visible(fn (Get $get): bool => (bool) $get('n5_reason2')),
+                    TextInput::make('n5_pay_replace')->label('Cost to replace the damaged property ($)')->numeric()
+                        ->visible(fn (Get $get): bool => (bool) $get('n5_reason2')),
+                ]),
+
+            \Filament\Forms\Components\Section::make('Reason 3 — overcrowding')
+                ->columns(1)->columnSpanFull()
+                ->schema([
+                    Checkbox::make('n5_reason3')->label('Include Reason 3 (checks the Reason 3 box on the form)')->live(),
+                    Radio::make('n5_reason3_option')
+                        ->label('Reason 3 — select the notice wording')
+                        ->options([
+                            'first' => 'You have 7 days to reduce the number of people living in the rental unit to the number specified below.',
+                            'second' => 'I can apply to the LTB immediately for an order to evict you.',
+                        ])
+                        ->default('first')
+                        ->visible(fn (Get $get): bool => (bool) $get('n5_reason3')),
+                    TextInput::make('n5_reason3_people')->label('Reduce number of people to (specify)')
+                        ->visible(fn (Get $get): bool => (bool) $get('n5_reason3')),
+                ]),
+
             Repeater::make('n5_events')->label('Details of the events (optional)')
                 ->schema([
                     TextInput::make('event_datetime')->label('Date & time'),
                     Textarea::make('event_details')->label('Details')->rows(2),
                 ])
                 ->columns(2)->maxItems(3)->defaultItems(0)->columnSpanFull(),
-            Select::make('n5_signer')->label('Signing as')->options(['landlord' => 'Landlord', 'representative' => 'Representative'])->default(self::SIGNER_ROLE),
-            TextInput::make('n5_signer_first_name')->label('Signer first name')->default(self::SIGNER_FIRST),
-            TextInput::make('n5_signer_last_name')->label('Signer last name')->default(self::SIGNER_LAST),
-            TextInput::make('n5_signer_phone')->label('Signer phone')->default(self::SIGNER_PHONE),
-            TextInput::make('n5_signature')->label('Signature (typed name)')->default(self::SIGNER_SIGNATURE),
-            DatePicker::make('n5_sign_date')->label('Date signed')->native(false)->displayFormat('M d, Y')->default($ctx['today']),
+
+            \Filament\Forms\Components\Section::make('Signature')
+                ->columns(2)->columnSpanFull()
+                ->schema([
+                    Select::make('n5_signer')->label('Signing as')
+                        ->options(['landlord' => 'Landlord', 'representative' => 'Representative'])
+                        ->default(self::SIGNER_ROLE)->live()->columnSpanFull(),
+                    TextInput::make('n5_signer_first_name')->label('First name')->default(self::SIGNER_FIRST),
+                    TextInput::make('n5_signer_last_name')->label('Last name')->default(self::SIGNER_LAST),
+                    TextInput::make('n5_signer_phone')->label('Phone number')->default(self::SIGNER_PHONE)->columnSpanFull(),
+                    TextInput::make('n5_signature')->label('Signature (typed name)')->default(self::SIGNER_SIGNATURE),
+                    DatePicker::make('n5_sign_date')->label('Date signed')->native(false)->displayFormat('M d, Y')->default($ctx['today']),
+                ]),
+
+            \Filament\Forms\Components\Section::make('Representative information')
+                ->description('Completed only when the notice is signed by a representative.')
+                ->columns(2)->columnSpanFull()
+                ->visible(fn (Get $get): bool => $get('n5_signer') === 'representative')
+                ->schema([
+                    TextInput::make('n5_rep_first_name')->label('First name')->default(self::SIGNER_FIRST),
+                    TextInput::make('n5_rep_last_name')->label('Last name')->default(self::SIGNER_LAST),
+                    TextInput::make('n5_rep_lso')->label('LSO number (if applicable)'),
+                    TextInput::make('n5_rep_company')->label('Company name (if applicable)')
+                        ->default($ctx['manager_company'] ?? self::MANAGER_COMPANY),
+                    TextInput::make('n5_rep_street_number')->label('Street number')
+                        ->default($ctx['manager_street_number'] ?? ''),
+                    TextInput::make('n5_rep_street_name')->label('Street name')
+                        ->default($ctx['manager_street_name'] ?? ''),
+                    TextInput::make('n5_rep_unit')->label('Unit/Apt./Suite')
+                        ->default($ctx['manager_unit'] ?? ''),
+                    TextInput::make('n5_rep_city')->label('Municipality')
+                        ->default($ctx['manager_city'] ?? ''),
+                    TextInput::make('n5_rep_province')->label('Province')
+                        ->default($ctx['manager_province'] ?? 'ON'),
+                    TextInput::make('n5_rep_postal_code')->label('Postal code')
+                        ->default($ctx['manager_postal'] ?? ''),
+                    TextInput::make('n5_rep_email')->label('Email address')
+                        ->default($ctx['manager_email'] ?? self::MANAGER_EMAIL),
+                    TextInput::make('n5_rep_phone')->label('Phone number')->default(self::SIGNER_PHONE),
+                ]),
         ];
     }
 
@@ -527,40 +787,75 @@ class FormFillService
         $r2opt = $data['n5_reason2_option'] ?? '7day';
         $r3opt = $data['n5_reason3_option'] ?? '7day';
 
+        // The on-disk template is the redesigned LTB N5 (2026/09). Its widgets are
+        // nested and use different names from the old N5, so map by the full widget
+        // path — the short-name fallback in fill_form.py can collide.
+        $b = 'form1[0].sfrmForm[0].';
         $values = [
-            'TO_TenameName' => $data['n5_tenant_name'] ?? null,
-            'From_LandlordName' => $data['n5_landlord_name'] ?? null,
-            'RentalUnitAddress' => $data['n5_unit_address'] ?? null,
-            'TerminationDate' => $term?->format('d/m/Y'),
-            'Reason1' => $r1 ? 'X' : null,
-            'Reason1_1#0' => $r1 && $r1opt === '7day' ? 'X' : null,
-            'Reason1_1#1' => $r1 && $r1opt === 'immediate' ? 'X' : null,
-            'Reason2' => $r2 ? 'X' : null,
-            'Reason2_1' => $r2 && $r2opt === '7day' ? 'X' : null,
-            'Reason2_2' => $r2 && $r2opt === 'immediate' ? 'X' : null,
-            'Reason3' => $r3 ? 'X' : null,
-            'Reason3_1' => $r3 && $r3opt === '7day' ? 'X' : null,
-            'Reason3_2' => $r3 && $r3opt === 'immediate' ? 'X' : null,
-            'Reason3Explain' => $data['n5_reason3_people'] ?? null,
-            'PayMe1' => $data['n5_pay_repair'] ?? null,
-            'PayMe2' => $data['n5_pay_replace'] ?? null,
-            'SelectSign#0' => $signer === 'landlord' ? 'X' : null,
-            'SelectSign#1' => $signer === 'representative' ? 'X' : null,
-            'RFirstName' => $data['n5_signer_first_name'] ?? null,
-            'RLastName' => $data['n5_signer_last_name'] ?? null,
-            'RDayPhone' => $data['n5_signer_phone'] ?? null,
-            'Signature' => $data['n5_signature'] ?? null,
-            'SignDate' => $sign->format('d/m/Y'),
+            // Page 1 — parties + structured unit address + termination date
+            $b . 'PartyAddressInfo[0].txtTenant[0]' => $data['n5_tenant_name'] ?? null,
+            $b . 'PartyAddressInfo[0].txtLandlord[0]' => $data['n5_landlord_name'] ?? null,
+            $b . 'PartyAddressInfo[0].txtNumber[0]' => $data['n5_street_number'] ?? null,
+            $b . 'PartyAddressInfo[0].txtName[0]' => $data['n5_street_name'] ?? null,
+            $b . 'PartyAddressInfo[0].txtUnit[0]' => $data['n5_unit'] ?? null,
+            $b . 'PartyAddressInfo[0].txtCity[0]' => $data['n5_city'] ?? null,
+            $b . 'PartyAddressInfo[0].txtProvince[0]' => $data['n5_province'] ?: 'ON',
+            $b . 'PartyAddressInfo[0].txtPostalCode[0]' => $data['n5_postal_code'] ?? null,
+            $b . 'InfofromLandlord1[0].TerminationDate[0]' => $term?->format('d/m/Y'),
+
+            // Reason 1 — substantial interference (radio #0 = first notice, #1 = second)
+            $b . 'Reasons[0].Reason1[0].Reason1[0]' => $r1 ? 'X' : null,
+            $b . 'Reasons[0].Reason1[0].Reason1_1[0]#0' => $r1 && $r1opt === 'first' ? 'X' : null,
+            $b . 'Reasons[0].Reason1[0].Reason1_1[0]#1' => $r1 && $r1opt === 'second' ? 'X' : null,
+
+            // Reason 2 — wilful/negligent damage (7-day radio on p1, immediate on p2)
+            $b . 'Reasons[0].Reason2[0].Reason2[0]' => $r2 ? 'X' : null,
+            $b . 'Reasons[0].Reason2[0].Reason2_1[0]' => $r2 && $r2opt === 'first' ? 'X' : null,
+            $b . 'Reasons[0].Reason2[0].Reason2_2[0]' => $r2 && $r2opt === 'second' ? 'X' : null,
+            $b . 'Reasons[0].Reason2[0].PayMe1[0]' => $data['n5_pay_repair'] ?? null,
+            $b . 'Reasons[0].Reason2[0].PayMe2[0]' => $data['n5_pay_replace'] ?? null,
+
+            // Reason 3 — overcrowding
+            $b . 'Reasons[0].Reason3[0].Reason3[0]' => $r3 ? 'X' : null,
+            $b . 'Reasons[0].Reason3[0].Reason3_1[0]' => $r3 && $r3opt === 'first' ? 'X' : null,
+            $b . 'Reasons[0].Reason3[0].Reason3_2[0]' => $r3 && $r3opt === 'second' ? 'X' : null,
+            $b . 'Reasons[0].Reason3[0].Reason3Explain[0]' => $data['n5_reason3_people'] ?? null,
+
+            // Signature block
+            $b . 'Signature[0].PartyType[0]#0' => $signer === 'landlord' ? 'X' : null,
+            $b . 'Signature[0].PartyType[0]#1' => $signer === 'representative' ? 'X' : null,
+            $b . 'Signature[0].txtFirstName[0]' => $data['n5_signer_first_name'] ?? null,
+            $b . 'Signature[0].txtLastName[0]' => $data['n5_signer_last_name'] ?? null,
+            $b . 'Signature[0].txtPhone1[0]' => $data['n5_signer_phone'] ?? null,
+            $b . 'Signature[0].Signature[0]' => $data['n5_signature'] ?? null,
+            $b . 'Signature[0].dptSignDate[0]' => $sign->format('d/m/Y'),
         ];
 
+        if ($signer === 'representative') {
+            $rep = $b . 'LegalRepInfo[0].sfrmLegalRepInfo_1[0].';
+            $values[$rep . 'txtFirstName[0]'] = $data['n5_rep_first_name'] ?? null;
+            $values[$rep . 'txtLastName[0]'] = $data['n5_rep_last_name'] ?? null;
+            $values[$rep . 'txtLSOnumber[0]'] = $data['n5_rep_lso'] ?? null;
+            $values[$rep . 'txtCompanyName[0]'] = $data['n5_rep_company'] ?? null;
+            $values[$rep . 'txtNumber[0]'] = $data['n5_rep_street_number'] ?? null;
+            $values[$rep . 'txtName[0]'] = $data['n5_rep_street_name'] ?? null;
+            $values[$rep . 'txtUnit[0]'] = $data['n5_rep_unit'] ?? null;
+            $values[$rep . 'txtCity[0]'] = $data['n5_rep_city'] ?? null;
+            $values[$rep . 'txtProvince[0]'] = $data['n5_rep_province'] ?: 'ON';
+            $values[$rep . 'txtPostalCode[0]'] = $data['n5_rep_postal_code'] ?? null;
+            $values[$rep . 'txtEmail[0]'] = $data['n5_rep_email'] ?? null;
+            $values[$rep . 'txtPhone1[0]'] = $data['n5_rep_phone'] ?? null;
+        }
+
         $events = $data['n5_events'] ?? [];
+        $tbl = $b . 'Details[0].Table1[0].';
         foreach (range(1, 3) as $i) {
             $row = $events[$i - 1] ?? null;
             if (! $row) {
                 continue;
             }
-            $values["EventDateTime{$i}"] = $row['event_datetime'] ?? null;
-            $values["Event{$i}"] = $row['event_details'] ?? null;
+            $values[$tbl . "Row{$i}[0].EventDateTime{$i}[0]"] = $row['event_datetime'] ?? null;
+            $values[$tbl . "Row{$i}[0].Event{$i}[0]"] = $row['event_details'] ?? null;
         }
 
         return $values;

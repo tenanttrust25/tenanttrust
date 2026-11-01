@@ -47,10 +47,10 @@
                 <a href="{{ url('/tenant/invoices') }}" class="button">Pay Online</a>
             </p>
 
-            <p style="color:#6b7280;font-size:13px;">If you have any questions regarding this invoice, please contact us at <a href="mailto:info@tenanttrust.ca" style="color:#DCA54A;">info@tenanttrust.ca</a> or call (705) 555-0123.</p>
+            <p style="color:#6b7280;font-size:13px;">If you have any questions regarding this invoice, please contact us at <a href="mailto:info@tenanttrust.ca" style="color:#DCA54A;">info@tenanttrust.ca</a> or call 249-523-3331.</p>
         </div>
         <div class="footer">
-            Tenant Trust Inc. &bull; 123 Main Street West, Sudbury, ON P3E 4T2 &bull; (705) 555-0123
+            Tenant Trust &bull; 474 McKim St Unit 3, Sudbury, ON P3C 2L6 &bull; 249-523-3331
         </div>
     </div>
 </body>

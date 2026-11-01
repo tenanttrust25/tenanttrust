@@ -18,7 +18,8 @@ class EditProfile extends Page
     protected static ?string $navigationIcon = "heroicon-o-user";
     protected static ?string $title = "My Profile";
     protected static ?string $navigationLabel = "My Profile";
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'Account';
+    protected static ?int $navigationSort = 1;
     protected static ?string $slug = "profile";
 
     protected static string $view = "filament.tenant.profile";
@@ -57,8 +58,8 @@ class EditProfile extends Page
                             ->maxLength(20),
                         TextInput::make("mailing_address")
                             ->label("Mailing Address")
-                            ->disabled()
-                            ->dehydrated(false),
+                            ->maxLength(255)
+                            ->helperText("Where we send mail — e.g. tax receipts, notices"),
                     ])
                     ->columns(2),
 
@@ -68,18 +69,15 @@ class EditProfile extends Page
                         TextInput::make("current_password")
                             ->label("Current Password")
                             ->password()
-                            ->revealable()
-                            ->dehydrated(false),
+                            ->revealable(),
                         TextInput::make("new_password")
                             ->label("New Password")
                             ->password()
-                            ->revealable()
-                            ->dehydrated(false),
+                            ->revealable(),
                         TextInput::make("new_password_confirmation")
                             ->label("Confirm New Password")
                             ->password()
-                            ->revealable()
-                            ->dehydrated(false),
+                            ->revealable(),
                     ])
                     ->columns(3),
             ])
@@ -93,6 +91,7 @@ class EditProfile extends Page
 
         $user->email = $data["email"];
         $user->phone = $data["phone"];
+        $user->mailing_address = $data["mailing_address"] ?? null;
 
         // Handle password change
         if (!empty($data["current_password"]) && !empty($data["new_password"])) {

@@ -17,10 +17,11 @@ class PropertyResource extends Resource
 
     protected static ?string $navigationIcon = "heroicon-o-building-office-2";
     protected static ?string $navigationLabel = "Properties";
+    protected static ?string $navigationGroup = "Properties";
     protected static ?string $pluralModelLabel = "Properties";
     protected static ?string $modelLabel = "Property";
     protected static ?string $slug = "properties";
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -121,7 +122,7 @@ class PropertyResource extends Resource
                             ->label("")
                             ->addActionLabel("Upload Document")
                             ->collapsible()
-                            ->itemLabel(fn (array $s): ?string => $s["name"] ?? "New Document")
+                            ->itemLabel(fn (array $state): ?string => $state["name"] ?? "New Document")
                             ->schema([
                                 Forms\Components\Select::make("tenant_id")
                                     ->label("Tenant")
