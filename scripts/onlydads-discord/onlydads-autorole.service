@@ -1,0 +1,20 @@
+[Unit]
+Description=Only Dad's Discord — assign the Open Door role on join
+After=network-online.target
+Wants=network-online.target
+# If the token is wrong or the member intent is off, stop flapping and log it.
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/onlydads-discord.env
+WorkingDirectory=/opt/onlydads-discord
+ExecStart=/opt/onlydads-discord/venv/bin/python /opt/onlydads-discord/autorole.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
