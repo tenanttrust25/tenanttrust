@@ -1,0 +1,11 @@
+[Unit]
+Description=TenantTrust nightly backup (MySQL dump + documents + off-box push)
+After=network-online.target mariadb.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/tenanttrust-backup.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
