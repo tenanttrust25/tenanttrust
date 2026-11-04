@@ -1,0 +1,9 @@
+[Unit]
+Description=Only Dad's Discord — assign Open Door role to new members
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.openclaw/workspace
+ExecStart=/usr/bin/python3 /root/.openclaw/workspace/scripts/discord_autorole.py

@@ -1,0 +1,9 @@
+[Unit]
+Description=Tenant Trust Twilio inbound SMS relay (poll Twilio -> SMS to Steve)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.openclaw/workspace
+ExecStart=/usr/bin/python3 /root/.openclaw/workspace/scripts/twilio_sms_forward.py

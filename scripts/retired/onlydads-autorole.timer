@@ -1,0 +1,11 @@
+[Unit]
+Description=Poll Only Dad's Discord members every 60s for unroled joins
+
+[Timer]
+OnBootSec=45s
+OnUnitActiveSec=60s
+AccuracySec=5s
+Unit=onlydads-autorole.service
+
+[Install]
+WantedBy=timers.target

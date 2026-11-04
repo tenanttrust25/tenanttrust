@@ -1,0 +1,10 @@
+[Unit]
+Description=Tenant Trust alerts (N9 + HOS) -> Telegram
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.openclaw/workspace
+ExecStart=/usr/bin/python3 /root/.openclaw/workspace/scripts/tenant_alerts.py
+TimeoutStartSec=180

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Tenant Trust N9 + HOS alerts every 5 minutes
+
+[Timer]
+OnBootSec=60s
+OnUnitActiveSec=5min
+AccuracySec=10s
+Unit=tenant-alerts.service
+
+[Install]
+WantedBy=timers.target
