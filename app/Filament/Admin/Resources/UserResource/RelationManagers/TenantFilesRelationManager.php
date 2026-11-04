@@ -23,7 +23,9 @@ class TenantFilesRelationManager extends RelationManager
             Forms\Components\Select::make("file_type")->options([
                 "lease" => "Lease", "N1" => "N1", "N4" => "N4", "other" => "Other",
             ]),
-            Forms\Components\FileUpload::make("file_path")->directory("tenant-files"),
+            Forms\Components\FileUpload::make("file_path")->directory("tenant-files")
+            ->disk('documents')
+                                    ->visibility('private'),
         ]);
     }
 
@@ -43,7 +45,7 @@ class TenantFilesRelationManager extends RelationManager
                     ->icon("heroicon-o-eye")
                     ->color("primary")
                     ->url(fn (TenantFile $record): ?string => $record->file_path
-                        ? Storage::disk("public")->url($record->file_path)
+                        ? route('files.tenant-file', $record)
                         : null)
                     ->openUrlInNewTab()
                     ->visible(fn (TenantFile $record): bool => (bool) $record->file_path),

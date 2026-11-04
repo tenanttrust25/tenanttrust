@@ -41,7 +41,7 @@ class N9SubmissionResource extends Resource
                         if (! $record?->file_path) {
                             return 'Not generated.';
                         }
-                        $url = Storage::disk('public')->url($record->file_path);
+                        $url = route('files.n9', $record);
                         return new \Illuminate\Support\HtmlString(
                             "<a href=\"{$url}\" target=\"_blank\" class=\"text-primary-600 underline\">Open filled N9 PDF</a>"
                         );
@@ -77,7 +77,7 @@ class N9SubmissionResource extends Resource
                     ->label("Open PDF")
                     ->icon("heroicon-o-document-arrow-down")
                     ->color("success")
-                    ->url(fn (N9Submission $record): ?string => $record->file_path ? Storage::disk('public')->url($record->file_path) : null)
+                    ->url(fn (N9Submission $record): ?string => $record->file_path ? route('files.n9', $record) : null)
                     ->openUrlInNewTab()
                     ->visible(fn (N9Submission $record): bool => (bool) $record->file_path),
                 Tables\Actions\ViewAction::make(),

@@ -73,6 +73,8 @@ class UserResource extends Resource
                                 Forms\Components\FileUpload::make("file_path")
                                     ->label("File")
                                     ->directory("tenant-files")
+                                    ->disk('documents')
+                                    ->visibility('private')
                                     ->preserveFilenames()
                                     ->required()
                                     ->openable()

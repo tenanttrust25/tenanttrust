@@ -52,7 +52,7 @@ class N9SubmissionMail extends Mailable
         }
 
         return [
-            Attachment::fromPath(Storage::disk('public')->path($this->submission->file_path)),
+            Attachment::fromPath(Storage::disk('documents')->path($this->submission->file_path)),
         ];
     }
 }

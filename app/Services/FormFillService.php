@@ -311,7 +311,7 @@ class FormFillService
     {
         $template = $this->templatePath($form, $category);
 
-        $outputDir = storage_path('app/public/form-submissions');
+        $outputDir = storage_path('app/documents/form-submissions');
         if (! is_dir($outputDir)) {
             mkdir($outputDir, 0775, true);
         }

@@ -79,6 +79,8 @@ class TenantFileResource extends Resource
                 FileUpload::make("file_path")
                     ->label("File")
                     ->directory("tenant-files")
+                    ->disk('documents')
+                    ->visibility('private')
                     ->required()
                     ->maxSize(20480),
             ]);

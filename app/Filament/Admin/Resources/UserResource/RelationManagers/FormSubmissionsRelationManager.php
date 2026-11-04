@@ -115,7 +115,7 @@ class FormSubmissionsRelationManager extends RelationManager
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
                     ->url(fn (FormSubmission $record): ?string => $record->file_path
-                        ? Storage::disk('public')->url($record->file_path)
+                        ? route('files.form-submission', $record)
                         : null)
                     ->openUrlInNewTab()
                     ->visible(fn (FormSubmission $record): bool => (bool) $record->file_path),
@@ -123,7 +123,7 @@ class FormSubmissionsRelationManager extends RelationManager
                     ->action(function (FormSubmission $record) {
                         // Clean up the physical PDF + linked tenant file row.
                         if ($record->file_path) {
-                            Storage::disk('public')->delete($record->file_path);
+                            Storage::disk('documents')->delete($record->file_path);
                             TenantFile::where('file_path', $record->file_path)->delete();
                         }
                         $record->delete();
@@ -236,7 +236,7 @@ class FormSubmissionsRelationManager extends RelationManager
             ->actions([
                 \Filament\Notifications\Actions\Action::make('open')
                     ->label('Open PDF')
-                    ->url(Storage::disk('public')->url($path))
+                    ->url(route('files.form-submission', $submission))
                     ->openUrlInNewTab(),
             ])
             ->send();

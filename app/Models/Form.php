@@ -36,6 +36,6 @@ class Form extends Model
 
     public function url(): string
     {
-        return Storage::disk('public')->url($this->file_path);
+        return route('files.form', $this);
     }
 }

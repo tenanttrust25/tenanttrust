@@ -153,6 +153,8 @@ class MaintenanceTicketResource extends Resource
                         Forms\Components\FileUpload::make("invoice_path")
                             ->label("Contractor Invoice (optional)")
                             ->directory("ticket-invoices")
+                            ->disk('documents')
+                            ->visibility('private')
                             ->preserveFilenames()
                             ->maxSize(8192)
                             ->columnSpanFull(),

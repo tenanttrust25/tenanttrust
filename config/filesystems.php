@@ -47,6 +47,16 @@ return [
             'report' => false,
         ],
 
+        // Tenant/owner documents (ID scans, applications, N9s, invoices).
+        // Deliberately NOT under app/public: nothing here is servable by nginx.
+        'documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/documents'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -82,7 +82,7 @@
                                                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-2">Files</p>
                                                     <div class="flex flex-wrap gap-2">
                                                         @foreach($files as $file)
-                                                            <a href="{{ asset("storage/" . $file->file_path) }}" target="_blank"
+                                                            <a href="{{ route('files.tenant-file', $file) }}" target="_blank"
                                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition"
                                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition text-gray-900 dark:text-white" style="background: #DCA54A;">
                                                                 <span>&#128196;</span>

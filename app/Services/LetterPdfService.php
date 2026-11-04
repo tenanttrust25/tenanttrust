@@ -52,7 +52,7 @@ class LetterPdfService
         $filename = 'Letter_' . now()->format('Ymd_His') . '_' . Str::upper(Str::random(4)) . '.pdf';
         $path = 'mail-items/' . $filename;
 
-        Storage::disk('public')->put($path, $bytes);
+        Storage::disk('documents')->put($path, $bytes);
 
         return $path;
     }

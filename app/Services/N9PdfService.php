@@ -19,7 +19,7 @@ class N9PdfService
     {
         $template = $this->templatePath();
 
-        $outputDir = storage_path('app/public/n9-submissions');
+        $outputDir = storage_path('app/documents/n9-submissions');
         if (! is_dir($outputDir)) {
             mkdir($outputDir, 0775, true);
         }

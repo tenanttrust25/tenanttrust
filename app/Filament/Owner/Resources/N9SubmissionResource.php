@@ -58,14 +58,14 @@ class N9SubmissionResource extends Resource
                     ->label("View Notice (PDF)")
                     ->icon("heroicon-o-document-arrow-down")
                     ->color("success")
-                    ->url(fn (N9Submission $record): ?string => $record->file_path ? Storage::disk('public')->url($record->file_path) : null)
+                    ->url(fn (N9Submission $record): ?string => $record->file_path ? route('files.n9', $record) : null)
                     ->openUrlInNewTab()
                     ->visible(fn (N9Submission $record): bool => (bool) $record->file_path),
                 Tables\Actions\Action::make("download_pdf")
                     ->label("Download")
                     ->icon("heroicon-o-arrow-down-tray")
                     ->color("primary")
-                    ->action(fn (N9Submission $record) => $record->file_path ? Storage::disk('public')->download($record->file_path) : null)
+                    ->action(fn (N9Submission $record) => $record->file_path ? Storage::disk('documents')->download($record->file_path) : null)
                     ->visible(fn (N9Submission $record): bool => (bool) $record->file_path),
             ])
             ->bulkActions([])

@@ -17,18 +17,18 @@ class InvoicePdfService
         ]);
 
         $filename = 'invoices/' . $invoice->invoice_number . '.pdf';
-        Storage::disk('public')->put($filename, $pdf->output());
+        Storage::disk('documents')->put($filename, $pdf->output());
 
         return $filename;
     }
 
     public function download(Invoice $invoice)
     {
-        if (!$invoice->file_path || !Storage::disk('public')->exists($invoice->file_path)) {
+        if (!$invoice->file_path || !Storage::disk('documents')->exists($invoice->file_path)) {
             $invoice->file_path = $this->generate($invoice);
             $invoice->save();
         }
 
-        return Storage::disk('public')->download($invoice->file_path);
+        return Storage::disk('documents')->download($invoice->file_path);
     }
 }

@@ -59,13 +59,13 @@ class DocumentResource extends Resource
                     ->label("Open")
                     ->icon("heroicon-o-arrow-top-right-on-square")
                     ->color("primary")
-                    ->url(fn (OwnerFile $record): string => Storage::disk("public")->url($record->file_path))
+                    ->url(fn (OwnerFile $record): string => route('files.owner-file', $record))
                     ->openUrlInNewTab(),
                 Tables\Actions\Action::make("download")
                     ->label("Download")
                     ->icon("heroicon-o-arrow-down-tray")
                     ->color("success")
-                    ->action(fn (OwnerFile $record) => Storage::disk("public")->download($record->file_path)),
+                    ->action(fn (OwnerFile $record) => Storage::disk("documents")->download($record->file_path)),
             ])
             ->bulkActions([])
             ->defaultSort("created_at", "desc");

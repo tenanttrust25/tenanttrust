@@ -81,7 +81,7 @@
                     </div>
                     @if($this->getTicket()->invoice_path)
                     <div>
-                        <a href="{{ asset("storage/" . $this->getTicket()->invoice_path) }}" target="_blank" class="inline-flex items-center gap-1 text-sm font-medium" style="color:#0F172A;">
+                        <a href="{{ route('files.ticket.invoice', $this->getTicket()) }}" target="_blank" class="inline-flex items-center gap-1 text-sm font-medium" style="color:#0F172A;">
                             View contractor invoice →
                         </a>
                     </div>
@@ -97,8 +97,9 @@
                 <h3 class="font-bold mb-4 uppercase text-sm tracking-wide" class="text-gray-900 dark:text-white" style=" font-family: Manrope, sans-serif;">Photos</h3>
                 <div class="grid grid-cols-3 gap-3">
                     @foreach($this->getTicket()->photos as $photo)
-                    <a href="{{ asset("storage/" . $photo) }}" target="_blank" class="block">
-                        <img src="{{ asset("storage/" . $photo) }}" class="w-full h-32 object-cover rounded-lg border hover:opacity-90 transition" alt="Ticket photo">
+                    @php($photoUrl = route('files.ticket.photo', ['ticket' => $this->getTicket(), 'index' => $loop->index]))
+                    <a href="{{ $photoUrl }}" target="_blank" class="block">
+                        <img src="{{ $photoUrl }}" class="w-full h-32 object-cover rounded-lg border hover:opacity-90 transition" alt="Ticket photo">
                     </a>
                     @endforeach
                 </div>

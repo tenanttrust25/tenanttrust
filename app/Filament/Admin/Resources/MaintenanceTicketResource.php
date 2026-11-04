@@ -141,6 +141,8 @@ class MaintenanceTicketResource extends Resource
                     ->multiple()
                     ->image()
                     ->directory("ticket-photos")
+                    ->disk('documents')
+                    ->visibility('private')
                     ->maxSize(5120)
                     ->visible($isCreate),
 

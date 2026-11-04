@@ -52,12 +52,12 @@ class FormSubmissionMail extends Mailable
     {
         $path = $this->submission->file_path;
 
-        if (! $path || ! Storage::disk('public')->exists($path)) {
+        if (! $path || ! Storage::disk('documents')->exists($path)) {
             return [];
         }
 
         return [
-            Attachment::fromPath(Storage::disk('public')->path($path))
+            Attachment::fromPath(Storage::disk('documents')->path($path))
                 ->as(basename($path))
                 ->withMime('application/pdf'),
         ];

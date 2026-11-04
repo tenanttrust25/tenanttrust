@@ -121,8 +121,10 @@ class MailItemResource extends Resource
                 ->schema([
                     Forms\Components\FileUpload::make('pdf_path')
                         ->label('PDF file')
-                        ->disk('public')
+                        ->disk('documents')
                         ->directory('mail-items')
+                        ->disk('documents')
+                        ->visibility('private')
                         ->acceptedFileTypes(['application/pdf'])
                         ->preserveFilenames()
                         ->required()

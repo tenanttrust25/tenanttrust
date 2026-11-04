@@ -4,15 +4,15 @@ use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\RentalApplicationController;
 use App\Http\Controllers\CloverPaymentController;
 use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\SecureFileController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::get("/", [WebsiteController::class, "home"])->name("home");
-use App\Http\Controllers\InstallController;
+// Installation wizard REMOVED 2026-11-03: the POST handler had no "already installed"
+// guard and could create a role=admin user on the live site. Re-enable only behind
+// an artisan command, never as a public route.
 
-// Installation wizard
-Route::get("/install", [InstallController::class, "index"])->name("install");
-Route::post("/install/run", [InstallController::class, "run"])->name("install.run");
 Route::get("/properties", [WebsiteController::class, "properties"])->name("properties.index");
 Route::get("/properties/{slug}", [WebsiteController::class, "propertyDetail"])->name("properties.show");
 Route::get("/properties/{slug}/inquire", [WebsiteController::class, "propertyInquire"])->name("properties.inquire");
@@ -124,6 +124,23 @@ Route::get("/invoice/pay/{token}", [App\Http\Controllers\OwnerInvoicePaymentCont
 Route::post("/invoice/pay/{token}/checkout", [App\Http\Controllers\OwnerInvoicePaymentController::class, "checkout"])->name("invoice.pay.checkout");
 Route::get("/invoice/pay/{token}/success", [App\Http\Controllers\OwnerInvoicePaymentController::class, "success"])->name("invoice.pay.success");
 Route::get("/invoice/pay/{token}/cancel", [App\Http\Controllers\OwnerInvoicePaymentController::class, "cancel"])->name("invoice.pay.cancel");
+
+// Authenticated file delivery — the ONLY way a tenant/owner document can be fetched
+// since /storage/ is denied at nginx. Every route checks the viewer.
+Route::prefix("files")->name("files.")->group(function () {
+    Route::get("tenant-file/{tenantFile}", [SecureFileController::class, "tenantFile"])->name("tenant-file");
+    Route::get("owner-file/{ownerFile}", [SecureFileController::class, "ownerFile"])->name("owner-file");
+    Route::get("n9/{n9Submission}", [SecureFileController::class, "n9"])->name("n9");
+    Route::get("ticket/{ticket}/invoice", [SecureFileController::class, "ticketInvoice"])->name("ticket.invoice");
+    Route::get("ticket/{ticket}/photo/{index}", [SecureFileController::class, "ticketPhoto"])->name("ticket.photo");
+    Route::get("invoice/{invoice}", [SecureFileController::class, "invoice"])->name("invoice");
+    Route::get("owner-invoice/{ownerInvoice}", [SecureFileController::class, "owner-invoice"])->name("owner-invoice");
+    Route::get("form/{form}", [SecureFileController::class, "form"])->name("form");
+    Route::get("signed/{encoded}", [SecureFileController::class, "signed"])->name("signed")->middleware("signed");
+    Route::get("form-submission/{formSubmission}", [SecureFileController::class, "formSubmission"])->name("form-submission");
+    Route::get("mail-item/{mailItem}", [SecureFileController::class, "mail-item"])->name("mail-item");
+    Route::get("application/{rentalApplication}/{field}", [SecureFileController::class, "application"])->name("application");
+});
 
 // Dynamic pages from database - must be LAST
 Route::get("/{slug}", [WebsiteController::class, "page"])->name("page");

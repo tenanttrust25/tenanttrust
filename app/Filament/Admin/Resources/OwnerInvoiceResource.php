@@ -119,6 +119,8 @@ class OwnerInvoiceResource extends Resource
                 FileUpload::make('file_path')
                     ->label('PDF File')
                     ->directory('owner-invoices')
+                    ->disk('documents')
+                    ->visibility('private')
                     ->acceptedFileTypes(['application/pdf'])
                     ->maxSize(10240),
             ]);

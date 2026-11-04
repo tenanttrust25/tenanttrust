@@ -104,7 +104,7 @@
             </x-filament::button>
 
             @if ($last_pdf)
-                <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($last_pdf) }}" target="_blank"
+                <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('files.signed', now()->addMinutes(10), ['encoded' => rtrim(strtr(base64_encode($last_pdf), '+/', '-_'), '=')]) }}" target="_blank"
                    class="text-sm text-primary-600 underline">
                     Open last generated PDF
                 </a>

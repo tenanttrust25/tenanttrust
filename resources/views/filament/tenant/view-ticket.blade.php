@@ -54,8 +54,9 @@
                     <h3 class="mb-4 text-sm font-bold uppercase tracking-wide text-gray-900 dark:text-white">Photos</h3>
                     <div class="grid grid-cols-3 gap-3">
                         @foreach($ticket->photos as $photo)
-                            <a href="{{ asset("storage/" . $photo) }}" target="_blank" class="block">
-                                <img src="{{ asset("storage/" . $photo) }}" class="h-32 w-full rounded-lg border object-cover transition hover:opacity-90" alt="Ticket photo">
+                            @php($photoUrl = route('files.ticket.photo', ['ticket' => $ticket, 'index' => $loop->index]))
+                            <a href="{{ $photoUrl }}" target="_blank" class="block">
+                                <img src="{{ $photoUrl }}" class="h-32 w-full rounded-lg border object-cover transition hover:opacity-90" alt="Ticket photo">
                             </a>
                         @endforeach
                     </div>

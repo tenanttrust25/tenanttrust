@@ -112,6 +112,8 @@ class InvoiceResource extends Resource
                 FileUpload::make("file_path")
                     ->label("PDF File")
                     ->directory("invoices")
+                    ->disk('documents')
+                    ->visibility('private')
                     ->acceptedFileTypes(["application/pdf"])
                     ->maxSize(10240),
             ]);

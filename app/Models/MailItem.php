@@ -69,7 +69,7 @@ class MailItem extends Model
 
     public function pdfUrl(): ?string
     {
-        return $this->pdf_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->pdf_path) : null;
+        return $this->pdf_path ? route('files.mail-item', $this) : null;
     }
 
     public function fullAddress(): string

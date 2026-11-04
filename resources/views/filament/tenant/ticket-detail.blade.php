@@ -46,7 +46,7 @@
             <p class="text-sm font-medium text-gray-500 mb-2">Photos</p>
             <div class="grid grid-cols-3 gap-2">
                 @foreach($ticket->photos as $photo)
-                    <img src="{{ asset("storage/" . $photo) }}" class="rounded-lg w-full h-24 object-cover" alt="Ticket photo">
+                    <img src="{{ route('files.ticket.photo', ['ticket' => $ticket, 'index' => $loop->index]) }}" class="rounded-lg w-full h-24 object-cover" alt="Ticket photo">
                 @endforeach
             </div>
         </div>

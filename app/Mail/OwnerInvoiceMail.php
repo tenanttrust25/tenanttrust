@@ -49,7 +49,7 @@ class OwnerInvoiceMail extends Mailable
     {
         $attachments = [];
 
-        if ($this->invoice->file_path && Storage::disk('public')->exists($this->invoice->file_path)) {
+        if ($this->invoice->file_path && Storage::disk('documents')->exists($this->invoice->file_path)) {
             $attachments[] = Attachment::fromStorageDisk('public', $this->invoice->file_path);
         }
 

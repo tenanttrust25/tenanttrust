@@ -349,13 +349,13 @@ class RentalApplicationResource extends Resource
                         Infolists\Components\TextEntry::make('gov_id_path')
                             ->label('Government Issued Photo ID')
                             ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : 'No file uploaded')
-                            ->url(fn (?string $state): ?string => $state ? \Illuminate\Support\Facades\Storage::disk('public')->url($state) : null)
+                            ->url(fn (?string $state, RentalApplication $record): ?string => $state ? route('files.application', [$record, 'gov_id_path']) : null)
                             ->openUrlInNewTab()
                             ->icon('heroicon-o-arrow-down-tray'),
                         Infolists\Components\TextEntry::make('proof_of_employment_path')
                             ->label('Proof of Income / Employment')
                             ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : 'No file uploaded')
-                            ->url(fn (?string $state): ?string => $state ? \Illuminate\Support\Facades\Storage::disk('public')->url($state) : null)
+                            ->url(fn (?string $state, RentalApplication $record): ?string => $state ? route('files.application', [$record, 'proof_of_employment_path']) : null)
                             ->openUrlInNewTab()
                             ->icon('heroicon-o-arrow-down-tray'),
                     ])
