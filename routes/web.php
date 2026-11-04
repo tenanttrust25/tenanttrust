@@ -53,6 +53,11 @@ Route::post("/twilio/record", [App\Http\Controllers\TwilioVoiceController::class
     ->middleware("twilio.signature")
     ->name("twilio.record");
 
+// Inbound SMS on the business number -> forwarded to Steve's mobile.
+Route::post("/twilio/sms", [App\Http\Controllers\TwilioSmsForwardController::class, "incoming"])
+    ->middleware("twilio.signature")
+    ->name("twilio.sms");
+
 // Stripe payment processing
 Route::post("/api/stripe/create-intent", [StripePaymentController::class, "createPaymentIntent"])
     ->middleware(["web", "auth"])

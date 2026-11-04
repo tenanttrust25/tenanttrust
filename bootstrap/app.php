@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'twilio/whisper',
             'twilio/askname',
             'twilio/record',
+            'twilio/sms',
         ]);
 
         $middleware->alias([
